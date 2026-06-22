@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Estoque - Supabase</title>
+    <!-- Script Oficial do Supabase via CDN -->
+    <script src="https://jsdelivr.net"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: #f4f6f9; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { margin-bottom: 20px; text-align: center; color: #1e293b; }
+        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; }
+        .tab-btn { padding: 10px 20px; border: none; background: none; font-size: 16px; font-weight: bold; cursor: pointer; color: #64748b; }
+        .tab-btn.active { color: #2563eb; border-bottom: 2px solid #2563eb; margin-bottom: -2px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { margin-bottom: 5px; font-size: 14px; color: #475569; }
+        input, select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; }
+        button { padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-submit { background-color: #2563eb; color: white; grid-column: 1 / -1; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        th { background-color: #f8fafc; }
+        .btn-delete { background-color: #ef4444; color: white; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Gerenciador de Produtos</h1>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('visualizar')">Visualizar / Deletar</button>
+        <button class="tab-btn" onclick="switchTab('inserir')">Inserir Novo Item</button>
+    </div>
+
+    <!-- Aba 1: Lista -->
+    <div id="visualizar" class="tab-content active">
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Descrição</th>
+                        <th>Característica</th>
+                        <th>Largura</th>
+                        <th>Comprimento</th>
+                        <th>Qtd Rolos</th>
+                        <th>Qtd m²</th>
+                        <th>Mts Lineares</th>
+                        <th>Reserva</th>
+                        <th>Saldo Livre</th>
+                        <th>Status</th>
+                        <th>Observação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="dados-tabela">
+                    <tr><td colspan="13">Carregando dados...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Aba 2: Formulário -->
+    <div id="inserir" class="tab-content">
+        <form id="produto-form">
+            <div class="form-group"><label>Descrição</label><input type="text" id="descricao_produto" required></div>
+            <div class="form-group"><label>Característica</label><input type="text" id="caracteristica"></div>
+            <div class="form-group"><label>Largura (m)</label><input type="number" id="largura_mts" step="0.01" required></div>
+            <div class="form-group"><label>Comprimento (m)</label><input type="number" id="comprim_mts" step="0.01" required></div>
+            <div class="form-group"><label>Qtd Rolos</label><input type="number" id="qtde_rolos_ur" required></div>
+            <div class="form-group"><label>Qtd m²</label><input type="number" id="qtde_m2" step="0.01" required></div>
+            <div class="form-group"><label>Mts Lineares</label><input type="number" id="mts_lineares" step="0.01" required></div>
+            <div class="form-group"><label>Reserva</label><input type="number" id="reserva_mts" step="0.01" value="0"></div>
+            <div class="form-group"><label>Saldo Livre</label><input type="number" id="saldo_livre_m" step="0.01" required></div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="status">
+                    <option value="Disponível">Disponível</option>
+                    <option value="Indisponível">Indisponível</option>
+                </select>
+            </div>
+            <div class="form-group" style="grid-column: span 2;"><label>Observação</label><input type="text" id="observacao"></div>
+            <button type="submit" class="btn-submit">Salvar Produto</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // INSIRA SUAS CREDENCIAIS AQUI
+    const SUPABASE_URL = "SEU_SUPABASE_URL"; 
+    const SUPABASE_ANON_KEY = "SUA_SUPABASE_ANON_KEY";
+    const NOME_TABELA = "NOME_DA_SUA_TABELA";
+
+    // Inicializa o cliente Supabase
+    const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(tabId === 'visualizar') carregarDados();
+    }
+
+    async function carregarDados() {
+        const tbody = document.getElementById('dados-tabela');
+        
+        const { data, error } = await supabase.from(NOME_TABELA).select('*').order('id', { ascending: true });
+
+        if (error) {
+            console.error("Erro retornado do Supabase:", error);
+            tbody.innerHTML = `<tr><td colspan="13" style="color:red;">Erro: ${error.message}. Verifique o console (F12).</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = '';
+        if(data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="13">Nenhum dado encontrado nesta tabela.</td></tr>';
+            return;
+        }
+
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.id}</td>
+                <td>${item.descricao_produto || ''}</td>
+                <td>${item.caracteristica || ''}</td>
+                <td>${item.largura_mts || 0}</td>
+                <td>${item.comprim_mts || 0}</td>
+                <td>${item.qtde_rolos_ur || 0}</td>
+                <td>${item.qtde_m2 || 0}</td>
+                <td>${item.mts_lineares || 0}</td>
+                <td>${item.reserva_mts || 0}</td>
+                <td>${item.saldo_livre_m || 0}</td>
+                <td>${item.status || ''}</td>
+                <td>${item.observacao || ''}</td>
+                <td><button class="btn-delete" onclick="deletarItem(${item.id})">Excluir</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    document.getElementById('produto-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const novoProduto = {
+            descricao_produto: document.getElementById('descricao_produto').value,
+            caracteristica: document.getElementById('caracteristica').value,
+            largura_mts: parseFloat(document.getElementById('largura_mts').value),
+            comprim_mts: parseFloat(document.getElementById('comprim_mts').value),
+            qtde_rolos_ur: parseInt(document.getElementById('qtde_rolos_ur').value),
+            qtde_m2: parseFloat(document.getElementById('qtde_m2').value),
+            mts_lineares: parseFloat(document.getElementById('mts_lineares').value),
+            reserva_mts: parseFloat(document.getElementById('reserva_mts').value) || 0,
+            saldo_livre_m: parseFloat(document.getElementById('saldo_livre_m').value),
+            status: document.getElementById('status').value,
+            observacao: document.getElementById('observacao').value
+        };
+
+        const { error } = await supabase.from(NOME_TABELA).insert([novoProduto]);
+
+        if (error) {
+            console.error("Erro ao inserir:", error);
+            alert('Erro ao salvar: ' + error.message);
+        } else {
+            alert('Item salvo com sucesso!');
+            document.getElementById('produto-form').reset();
+            switchTab('visualizar');
+        }
+    });
+
+    async function deletarItem(id) {
+        if (!confirm(`Excluir o ID ${id}?`)) return;
+
+        const { error } = await supabase.from(NOME_TABELA).delete().eq('id', id);
+
+        if (error) {
+            console.error("Erro ao deletar:", error);
+            alert('Erro ao deletar: ' + error.message);
+        } else {
+            carregarDados();
+        }
+    }
+
+    window.onload = carregarDados;
+</script>
+</body>
+</html>
