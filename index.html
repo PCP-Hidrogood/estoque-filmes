@@ -272,8 +272,8 @@
                     <input type="number" id="reserva_mts" step="0.01" value="0" />
                 </div>
                 <div class="form-group">
-                    <label for="saldo_libre_m">Saldo Livre</label>
-                    <input type="number" id="saldo_libre_m" step="0.01" required />
+                    <label for="saldo_livre_mts">Saldo Livre</label>
+                    <input type="number" id="saldo_livre_mts" step="0.01" required />
                 </div>
                 <div class="form-group">
                     <label for="status">Status</label>
@@ -378,7 +378,7 @@
                                 <td>${item.qtde_m2 ?? 0}</td>
                                 <td>${item.mts_lineares ?? 0}</td>
                                 <td>${item.reserva_mts ?? 0}</td>
-                                <td>${item.saldo_libre_m ?? 0}</td>
+                                <td>${item.saldo_livre_mts ?? 0}</td>
                                 <td>${escapeHTML(item.status || '')}</td>
                                 <td>${escapeHTML(item.observacao || '')}</td>
                                 <td>
@@ -446,7 +446,7 @@
                 const qtde_m2 = parseFloat(document.getElementById('qtde_m2').value);
                 const mts_lineares = parseFloat(document.getElementById('mts_lineares').value);
                 const reserva_mts = parseFloat(document.getElementById('reserva_mts').value) || 0;
-                const saldo_libre_m = parseFloat(document.getElementById('saldo_libre_m').value);
+                const saldo_livre_mts = parseFloat(document.getElementById('saldo_livre_mts').value);
                 const status = document.getElementById('status').value;
                 const observacao = document.getElementById('observacao').value.trim();
 
@@ -465,7 +465,7 @@
                     qtde_m2,
                     mts_lineares,
                     reserva_mts,
-                    saldo_libre_m,
+                    saldo_livre_mts,
                     status,
                     observacao
                 };
