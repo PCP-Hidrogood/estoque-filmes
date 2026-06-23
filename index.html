@@ -1,185 +1,555 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gerenciador de Estoque - Supabase</title>
-    
-    <!-- Biblioteca Oficial do Supabase v2 Embutida e Convertida para evitar bloqueios de proxy/rede corporativa -->
-    <script>
-    !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports):"function"==typeof define&&define.amd?define(["exports"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).supabase={})}(this,(function(e){"use strict";var t="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{};class r{constructor(e,t){this.url=e,this.key=t}from(e){return{select:async(t="*")=>{try{let r=await fetch(`${this.url}/rest/v1/${e}?select=${encodeURIComponent(t)}&order=id.asc`,{method:"GET",headers:{apikey:this.key,Authorization:`Bearer ${this.key}`}});if(!r.ok){let e=await r.json();return{data:null,error:e}}let o=await r.json();return{data:o,error:null}}catch(e){return{data:null,error:e}}},insert:async(t)=>{try{let r=await fetch(`${this.url}/rest/v1/${e}`,{method:"POST",headers:{apikey:this.key,Authorization:`Bearer ${this.key}`,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify(t)});if(!r.ok){let e=await r.json();return{error:e}}return{error:null}}catch(e){return{error:e}}},delete:()=>({eq:async(t,r)=>{try{let o=await fetch(`${this.url}/rest/v1/${e}?${t}=eq.${r}`,{method:"DELETE",headers:{apikey:this.key,Authorization:`Bearer ${this.key}`}});if(!o.ok){let e=await o.json();return{error:e}}return{error:null}}catch(e){return{error:e}}})}}}e.createClient=function(e,t){return new r(e,t)},Object.defineProperty(e,"__esModule",{value:!0})}));
+
+    <!-- Biblioteca oficial do Supabase via CDN (versão 2) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
 
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f6f9; color: #333; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h1 { margin-bottom: 20px; text-align: center; color: #1e293b; font-size: 24px; }
-        
-        /* Abas de Navegação */
-        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; }
-        .tab-btn { padding: 10px 20px; border: none; background: none; font-size: 16px; font-weight: 600; cursor: pointer; color: #64748b; transition: all 0.2s; }
-        .tab-btn.active { color: #2563eb; border-bottom: 2px solid #2563eb; margin-bottom: -2px; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        /* Reset e estilos gerais */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-        /* Estrutura do Formulário */
-        form { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .form-group { display: flex; flex-direction: column; }
-        label { margin-bottom: 5px; font-size: 14px; font-weight: 500; color: #475569; }
-        input, select { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px; outline: none; }
-        input:focus, select:focus { border-color: #2563eb; }
-        button { padding: 10px 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-        .btn-submit { background-color: #2563eb; color: white; grid-column: 1 / -1; font-size: 16px; margin-top: 10px; }
-        .btn-submit:hover { background-color: #1d4ed8; }
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            padding: 20px;
+        }
 
-        /* Estilização da Tabela */
-        .table-responsive { overflow-x: auto; width: 100%; border: 1px solid #e2e8f0; border-radius: 6px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; font-size: 14px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
-        th { background-color: #f8fafc; color: #475569; font-weight: 600; }
-        tr:hover { background-color: #f1f5f9; }
-        .btn-delete { background-color: #ef4444; color: white; padding: 6px 12px; font-size: 12px; border-radius: 4px; }
-        .btn-delete:hover { background-color: #dc2626; }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #1e293b;
+            font-size: 24px;
+        }
+
+        /* Abas de navegação */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: #2563eb;
+            border-bottom: 2px solid #2563eb;
+            margin-bottom: -2px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Formulário em grid */
+        form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        input,
+        select {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2563eb;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-submit {
+            background-color: #2563eb;
+            color: white;
+            grid-column: 1 / -1;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Tabela */
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .btn-delete {
+            background-color: #ef4444;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .btn-delete:hover {
+            background-color: #dc2626;
+        }
+
+        /* Mensagens de erro / carregamento */
+        .mensagem {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .erro {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .sucesso {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h1>Gerenciador de Produtos</h1>
+    <div class="container">
+        <h1>Gerenciador de Produtos</h1>
 
-    <!-- Controle de Abas -->
-    <div class="tabs">
-        <button id="tab-visualizar-btn" class="tab-btn active" onclick="switchTab('visualizar')">Visualizar / Deletar</button>
-        <button id="tab-inserir-btn" class="tab-btn" onclick="switchTab('inserir')">Inserir Novo Item</button>
-    </div>
+        <!-- Controle de abas -->
+        <div class="tabs">
+            <button id="tab-visualizar-btn" class="tab-btn active">Visualizar / Deletar</button>
+            <button id="tab-inserir-btn" class="tab-btn">Inserir Novo Item</button>
+        </div>
 
-    <!-- Conteúdo Aba 1: Tabela de Dados -->
-    <div id="visualizar" class="tab-content active">
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Descrição</th>
-                        <th>Característica</th>
-                        <th>Largura (m)</th>
-                        <th>Compr. (m)</th>
-                        <th>Qtd Rolos</th>
-                        <th>Qtd m²</th>
-                        <th>Mts Lineares</th>
-                        <th>Reserva (m)</th>
-                        <th>Saldo Livre</th>
-                        <th>Status</th>
-                        <th>Observação</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="dados-tabela">
-                    <tr><td colspan="13">Carregando dados do estoque...</td></tr>
-                </tbody>
-            </table>
+        <!-- Aba: Visualizar -->
+        <div id="visualizar" class="tab-content active">
+            <div id="mensagem-visualizar" class="mensagem" style="display:none;"></div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Descrição</th>
+                            <th>Característica</th>
+                            <th>Largura (m)</th>
+                            <th>Compr. (m)</th>
+                            <th>Qtd Rolos</th>
+                            <th>Qtd m²</th>
+                            <th>Mts Lineares</th>
+                            <th>Reserva (m)</th>
+                            <th>Saldo Livre</th>
+                            <th>Status</th>
+                            <th>Observação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dados-tabela">
+                        <tr>
+                            <td colspan="13">Carregando dados do estoque...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Aba: Inserir -->
+        <div id="inserir" class="tab-content">
+            <div id="mensagem-inserir" class="mensagem" style="display:none;"></div>
+            <form id="produto-form">
+                <div class="form-group">
+                    <label for="descricao_do_produto">Descrição do Produto</label>
+                    <input type="text" id="descricao_do_produto" required />
+                </div>
+                <div class="form-group">
+                    <label for="caracteristica">Característica</label>
+                    <input type="text" id="caracteristica" />
+                </div>
+                <div class="form-group">
+                    <label for="largura_mts">Largura (mts)</label>
+                    <input type="number" id="largura_mts" step="0.01" required />
+                </div>
+                <div class="form-group">
+                    <label for="comprim_mts">Comprimento (mts)</label>
+                    <input type="number" id="comprim_mts" step="0.01" required />
+                </div>
+                <div class="form-group">
+                    <label for="qtde_rolos_un">Qtd Rolos (un)</label>
+                    <input type="number" id="qtde_rolos_un" required />
+                </div>
+                <div class="form-group">
+                    <label for="qtde_m2">Qtd m²</label>
+                    <input type="number" id="qtde_m2" step="0.01" required />
+                </div>
+                <div class="form-group">
+                    <label for="mts_lineares">Mts Lineares</label>
+                    <input type="number" id="mts_lineares" step="0.01" required />
+                </div>
+                <div class="form-group">
+                    <label for="reserva_mts">Reserva (mts)</label>
+                    <input type="number" id="reserva_mts" step="0.01" value="0" />
+                </div>
+                <div class="form-group">
+                    <label for="saldo_libre_m">Saldo Livre</label>
+                    <input type="number" id="saldo_libre_m" step="0.01" required />
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status">
+                        <option value="Disponível">Disponível</option>
+                        <option value="Indisponível">Indisponível</option>
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="observacao">Observação</label>
+                    <input type="text" id="observacao" />
+                </div>
+                <button type="submit" class="btn-submit">Salvar Produto</button>
+            </form>
         </div>
     </div>
 
-    <!-- Conteúdo Aba 2: Formulário de Inserção -->
-    <div id="inserir" class="tab-content">
-        <form id="produto-form">
-            <div class="form-group">
-                <label for="descricao_produto">Descrição do Produto</label>
-                <input type="text" id="descricao_produto" required>
-            </div>
-            <div class="form-group">
-                <label for="caracteristica">Característica</label>
-                <input type="text" id="caracteristica">
-            </div>
-            <div class="form-group">
-                <label for="largura_mts">Largura (mts)</label>
-                <input type="number" id="largura_mts" step="0.01" required>
-            </div>
-            <div class="form-group">
-                <label for="comprim_mts">Comprimento (mts)</label>
-                <input type="number" id="comprim_mts" step="0.01" required>
-            </div>
-            <div class="form-group">
-                <label for="qtde_rolos_un">Qtd Rolos (un)</label>
-                <input type="number" id="qtde_rolos_un" required>
-            </div>
-            <div class="form-group">
-                <label for="qtde_m2">Qtd m²</label>
-                <input type="number" id="qtde_m2" step="0.01" required>
-            </div>
-            <div class="form-group">
-                <label for="mts_lineares">Mts Lineares</label>
-                <input type="number" id="mts_lineares" step="0.01" required>
-            </div>
-            <div class="form-group">
-                <label for="reserva_mts">Reserva (mts)</label>
-                <input type="number" id="reserva_mts" step="0.01" value="0">
-            </div>
-            <div class="form-group">
-                <label for="saldo_libre_m">Saldo Livre</label>
-                <input type="number" id="saldo_libre_m" step="0.01" required>
-            </div>
-            <div class="form-group">
-                <label for="status">Status</label>
-                <select id="status">
-                    <option value="Disponível">Disponível</option>
-                    <option value="Indisponível">Indisponível</option>
-                </select>
-            </div>
-            <div class="form-group" style="grid-column: span 2;">
-                <label for="observacao">Observação</label>
-                <input type="text" id="observacao">
-            </div>
-            <button type="submit" class="btn-submit">Salvar Produto</button>
-        </form>
-    </div>
-</div>
+    <script>
+        (function() {
+            'use strict';
 
-<script>
-    // Configurações do Banco de Dados do Projeto
-    const SUPABASE_URL = "https://supabase.co"; 
-    const SUPABASE_ANON_KEY = "sb_publishable_7p2JEkqrYlIGSBdhuk_33yA_QMHxSiJt";
-    const NOME_TABELA = "produtos";
+            // ============================================================
+            // 1. CONFIGURAÇÃO DO SUPABASE
+            // ============================================================
+            const SUPABASE_URL = 'https://hbchbgymexmlbkyyydqu.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_7p2JEkqrYlIGSBdhuk_33yA_QMHxSiJt';
+            const NOME_TABELA = 'produtos';
 
-    // Inicialização do cliente utilizando a biblioteca embutida localmente
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            // Cria o cliente Supabase
+            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Gerenciador de Abas do Sistema
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        
-        document.getElementById(tabId).classList.add('active');
-        
-        if (tabId === 'visualizar') {
-            document.getElementById('tab-visualizar-btn').classList.add('active');
-            carregarDados();
-        } else {
-            document.getElementById('tab-inserir-btn').classList.add('active');
-        }
-    }
+            // ============================================================
+            // 2. ELEMENTOS DOM
+            // ============================================================
+            const tbody = document.getElementById('dados-tabela');
+            const form = document.getElementById('produto-form');
+            const tabVisualizar = document.getElementById('visualizar');
+            const tabInserir = document.getElementById('inserir');
+            const btnVisualizar = document.getElementById('tab-visualizar-btn');
+            const btnInserir = document.getElementById('tab-inserir-btn');
+            const msgVisualizar = document.getElementById('mensagem-visualizar');
+            const msgInserir = document.getElementById('mensagem-inserir');
 
-    // Carregar e renderizar os dados vindos do Supabase
-    async function carregarDados() {
-        const tbody = document.getElementById('dados-tabela');
-        if (!tbody) return;
-        tbody.innerHTML = '<tr><td colspan="13">Buscando dados atualizados no banco...</td></tr>';
-        
-        const { data, error } = await db.from(NOME_TABELA).select('*');
+            // ============================================================
+            // 3. FUNÇÕES AUXILIARES (exibir mensagens)
+            // ============================================================
+            function exibirMensagem(elemento, texto, tipo) {
+                elemento.textContent = texto;
+                elemento.className = 'mensagem ' + tipo;
+                elemento.style.display = 'block';
+                // Oculta automaticamente após 5 segundos
+                clearTimeout(elemento._timeout);
+                elemento._timeout = setTimeout(() => {
+                    elemento.style.display = 'none';
+                }, 5000);
+            }
 
-        if (error) {
-            console.error("Erro retornado:", error);
-            tbody.innerHTML = `<tr><td colspan="13" style="color:red; font-weight:bold;">Falha ao carregar dados: ${error.message || JSON.stringify(error)}</td></tr>`;
-            return;
-        }
+            function exibirErro(elemento, erro) {
+                const msg = erro.message || String(erro);
+                exibirMensagem(elemento, '❌ ' + msg, 'erro');
+                console.error('Erro:', erro);
+            }
 
-        tbody.innerHTML = '';
-        if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="13">Nenhum produto cadastrado na tabela.</td></tr>';
-            return;
-        }
+            function exibirSucesso(elemento, texto) {
+                exibirMensagem(elemento, '✅ ' + texto, 'sucesso');
+            }
 
-        data.forEach(item => {
-const tr = document.createElement('tr');tr.innerHTML = <td><b>${item.id}</b></td> <td>${item.descricao_produto || ''}</td> <td>${item.caracteristica || ''}</td> <td>${item.largura_mts || 0}</td> <td>${item.comprim_mts || 0}</td> <td>${item.qtde_rolos_un || 0}</td> <td>${item.qtde_m2 || 0}</td> <td>${item.mts_lineares || 0}</td> <td>${item.reserva_mts || 0}</td> <td>${item.saldo_libre_m || 0}</td> <td>${item.status || ''}</td> <td>${item.observacao || ''}</td> <td><button class="btn-delete" onclick="deletarItem(${item.id})">Excluir</button></td>;tbody.appendChild(tr);});}// Processar o envio do formulário de novos produtosdocument.getElementById('produto-form').addEventListener('submit', async (e) => {e.preventDefault();const novoItem = {descricao_produto: document.getElementById('descricao_produto').value,caracteristica: document.getElementById('caracteristica').value,largura_mts: parseFloat(document.getElementById('largura_mts').value),comprim_mts: parseFloat(document.getElementById('comprim_mts').value),qtde_rolos_un: parseInt(document.getElementById('qtde_rolos_un').value),qtde_m2: parseFloat(document.getElementById('qtde_m2').value),mts_lineares: parseFloat(document.getElementById('mts_lineares').value),reserva_mts: parseFloat(document.getElementById('reserva_mts').value) || 0,saldo_libre_m: parseFloat(document.getElementById('saldo_libre_m').value),status: document.getElementById('status').value,observacao: document.getElementById('observacao').value};const { error } = await db.from(NOME_TABELA).insert(novoItem);if (error) {alert('Falha ao registrar produto: ' + (error.message || JSON.stringify(error)));} else {alert('Produto registrado com sucesso!');document.getElementById('produto-form').reset();switchTab('visualizar');}});// Excluir um produto do banco de dados pelo IDasync function deletarItem(id) {if (!confirm(Deseja permanentemente excluir o produto com ID ${id}?)) return;const { error } = await db.from(NOME_TABELA).delete().eq('id', id);if (error) {alert('Falha ao excluir item: ' + (error.message || JSON.stringify(error)));} else {carregarDados();}}// Inicialização da listagem ao abrir a páginawindow.onload = carregarDados;
+            // ============================================================
+            // 4. CARREGAR DADOS (tabela)
+            // ============================================================
+            async function carregarDados() {
+                // Mostra loading
+                tbody.innerHTML = '<tr><td colspan="13">Carregando dados...</td></tr>';
+                msgVisualizar.style.display = 'none';
+
+                try {
+                    const { data, error } = await supabaseClient
+                        .from(NOME_TABELA)
+                        .select('*')
+                        .order('id', { ascending: true });
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    if (!data || data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="13">Nenhum produto cadastrado.</td></tr>';
+                        return;
+                    }
+
+                    // Monta as linhas da tabela usando template strings
+                    let html = '';
+                    data.forEach(item => {
+                        html += `
+                            <tr>
+                                <td><b>${item.id}</b></td>
+                                <td>${escapeHTML(item.descricao_do_produto || '')}</td>
+                                <td>${escapeHTML(item.caracteristica || '')}</td>
+                                <td>${item.largura_mts ?? 0}</td>
+                                <td>${item.comprim_mts ?? 0}</td>
+                                <td>${item.qtde_rolos_un ?? 0}</td>
+                                <td>${item.qtde_m2 ?? 0}</td>
+                                <td>${item.mts_lineares ?? 0}</td>
+                                <td>${item.reserva_mts ?? 0}</td>
+                                <td>${item.saldo_libre_m ?? 0}</td>
+                                <td>${escapeHTML(item.status || '')}</td>
+                                <td>${escapeHTML(item.observacao || '')}</td>
+                                <td>
+                                    <button class="btn-delete" data-id="${item.id}">Excluir</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    tbody.innerHTML = html;
+
+                    // Associa eventos de clique nos botões "Excluir"
+                    document.querySelectorAll('.btn-delete').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = parseInt(this.getAttribute('data-id'), 10);
+                            deletarItem(id);
+                        });
+                    });
+
+                } catch (err) {
+                    console.error('Erro ao carregar dados:', err);
+                    tbody.innerHTML =
+                        `<tr><td colspan="13" style="color:red; font-weight:bold;">Erro ao carregar dados: ${escapeHTML(err.message || 'Erro desconhecido')}</td></tr>`;
+                    exibirErro(msgVisualizar, err);
+                }
+            }
+
+            // ============================================================
+            // 5. DELETAR ITEM
+            // ============================================================
+            async function deletarItem(id) {
+                if (!confirm(`Deseja excluir permanentemente o produto com ID ${id}?`)) {
+                    return;
+                }
+
+                try {
+                    const { error } = await supabaseClient
+                        .from(NOME_TABELA)
+                        .delete()
+                        .eq('id', id);
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    exibirSucesso(msgVisualizar, `Produto ID ${id} excluído com sucesso!`);
+                    await carregarDados(); // recarrega a tabela
+                } catch (err) {
+                    console.error('Erro ao excluir:', err);
+                    exibirErro(msgVisualizar, err);
+                }
+            }
+
+            // ============================================================
+            // 6. INSERIR NOVO ITEM
+            // ============================================================
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                // Coleta os valores do formulário
+                const descricao_do_produto = document.getElementById('descricao_do_produto').value.trim();
+                const caracteristica = document.getElementById('caracteristica').value.trim();
+                const largura_mts = parseFloat(document.getElementById('largura_mts').value);
+                const comprim_mts = parseFloat(document.getElementById('comprim_mts').value);
+                const qtde_rolos_un = parseInt(document.getElementById('qtde_rolos_un').value, 10);
+                const qtde_m2 = parseFloat(document.getElementById('qtde_m2').value);
+                const mts_lineares = parseFloat(document.getElementById('mts_lineares').value);
+                const reserva_mts = parseFloat(document.getElementById('reserva_mts').value) || 0;
+                const saldo_libre_m = parseFloat(document.getElementById('saldo_libre_m').value);
+                const status = document.getElementById('status').value;
+                const observacao = document.getElementById('observacao').value.trim();
+
+                // Validação simples (os campos com 'required' já são validados pelo HTML)
+                if (!descricao_do_produto) {
+                    exibirErro(msgInserir, 'A descrição do produto é obrigatória.');
+                    return;
+                }
+
+                const novoItem = {
+                    descricao_do_produto,
+                    caracteristica,
+                    largura_mts,
+                    comprim_mts,
+                    qtde_rolos_un,
+                    qtde_m2,
+                    mts_lineares,
+                    reserva_mts,
+                    saldo_libre_m,
+                    status,
+                    observacao
+                };
+
+                try {
+                    const { data, error } = await supabaseClient
+                        .from(NOME_TABELA)
+                        .insert([novoItem])
+                        .select(); // para obter o registro inserido (opcional)
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    exibirSucesso(msgInserir, 'Produto cadastrado com sucesso!');
+                    form.reset(); // limpa o formulário
+                    // Volta para a aba Visualizar e recarrega os dados
+                    switchTab('visualizar');
+                    await carregarDados();
+
+                } catch (err) {
+                    console.error('Erro ao inserir:', err);
+                    exibirErro(msgInserir, err);
+                }
+            });
+
+            // ============================================================
+            // 7. TROCA DE ABAS
+            // ============================================================
+            function switchTab(tabId) {
+                // Esconde todas as abas
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+                if (tabId === 'visualizar') {
+                    tabVisualizar.classList.add('active');
+                    btnVisualizar.classList.add('active');
+                    // Recarrega os dados ao entrar na aba
+                    carregarDados();
+                } else if (tabId === 'inserir') {
+                    tabInserir.classList.add('active');
+                    btnInserir.classList.add('active');
+                    // Limpa mensagens da aba de inserção
+                    msgInserir.style.display = 'none';
+                }
+            }
+
+            // Eventos das abas
+            btnVisualizar.addEventListener('click', function() {
+                switchTab('visualizar');
+            });
+            btnInserir.addEventListener('click', function() {
+                switchTab('inserir');
+            });
+
+            // ============================================================
+            // 8. INICIALIZAÇÃO
+            // ============================================================
+            window.addEventListener('load', function() {
+                // Inicia na aba Visualizar (já está ativa por padrão)
+                carregarDados();
+            });
+
+            // ============================================================
+            // 9. UTILITÁRIO: escapeHTML para evitar XSS
+            // ============================================================
+            function escapeHTML(str) {
+                if (!str) return '';
+                return str.replace(/[&<>"]/g, function(m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    if (m === '"') return '&quot;';
+                    return m;
+                });
+            }
+
+            // Exporta funções para uso global (caso necessário)
+            window.switchTab = switchTab;
+            window.carregarDados = carregarDados;
+            window.deletarItem = deletarItem;
+
+        })();
+    </script>
+
+</body>
+</html>
