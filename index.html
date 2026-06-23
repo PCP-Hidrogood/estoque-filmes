@@ -3,192 +3,479 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gerenciador de Estoque - Supabase</title>
+    <title>Controle de Corte de Filmes e Telas</title>
 
-    <!-- Biblioteca oficial do Supabase via CDN (versão 2) -->
+    <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
 
+    <!-- Font Awesome (ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
     <style>
-        /* Reset e estilos gerais */
+        /* ===== RESET ===== */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: #f4f6f9;
-            color: #333;
-            padding: 20px;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            background: #f0f4f8;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 1400px;
+            width: 100%;
             background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            padding: 30px 32px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s;
         }
 
-        h1 {
-            margin-bottom: 20px;
-            text-align: center;
-            color: #1e293b;
-            font-size: 24px;
+        /* ===== CABEÇALHO ===== */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+            border-bottom: 2px solid #e9edf2;
+            padding-bottom: 20px;
         }
 
-        /* Abas de navegação */
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #0b1a33;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            color: #2563eb;
+            font-size: 28px;
+        }
+
+        .header .badge {
+            background: #2563eb;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 30px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+        }
+
+        /* ===== ABAS ===== */
         .tabs {
             display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
             border-bottom: 2px solid #e2e8f0;
-            margin-bottom: 20px;
+            padding-bottom: 2px;
         }
 
         .tab-btn {
-            padding: 10px 20px;
+            padding: 10px 24px;
             border: none;
-            background: none;
-            font-size: 16px;
+            background: transparent;
+            font-size: 15px;
             font-weight: 600;
-            cursor: pointer;
             color: #64748b;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn i {
+            font-size: 16px;
+        }
+
+        .tab-btn:hover {
+            background: #f1f5f9;
+            color: #1e293b;
         }
 
         .tab-btn.active {
             color: #2563eb;
-            border-bottom: 2px solid #2563eb;
-            margin-bottom: -2px;
+            background: #eff6ff;
+            border-bottom: 3px solid #2563eb;
         }
 
         .tab-content {
             display: none;
+            animation: fadeIn 0.25s ease;
         }
 
         .tab-content.active {
             display: block;
         }
 
-        /* Formulário em grid */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== MENSAGENS ===== */
+        .mensagem {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+        }
+        .erro {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+        .sucesso {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        /* ===== FORMULÁRIO ===== */
         form {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 18px 20px;
+            background: #fafcff;
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid #e9edf2;
+            margin-bottom: 10px;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
+            gap: 4px;
         }
 
-        label {
-            margin-bottom: 5px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #475569;
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            letter-spacing: 0.2px;
         }
 
-        input,
-        select {
-            padding: 8px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
+        .form-group input,
+        .form-group select {
+            padding: 10px 14px;
+            border: 1.5px solid #d1d9e6;
+            border-radius: 10px;
             font-size: 14px;
+            transition: 0.15s;
+            background: white;
             outline: none;
         }
 
-        input:focus,
-        select:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             border-color: #2563eb;
-        }
-
-        button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
         .btn-submit {
-            background-color: #2563eb;
-            color: white;
             grid-column: 1 / -1;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 14px;
             font-size: 16px;
-            margin-top: 10px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
-
         .btn-submit:hover {
-            background-color: #1d4ed8;
+            transform: scale(1.01);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+        }
+        .btn-submit:active {
+            transform: scale(0.98);
         }
 
-        /* Tabela */
+        /* ===== TABELA ===== */
         .table-responsive {
             overflow-x: auto;
-            width: 100%;
+            border-radius: 14px;
             border: 1px solid #e2e8f0;
-            border-radius: 6px;
+            background: white;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1000px;
-            font-size: 14px;
-        }
-
-        th,
-        td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
+            font-size: 13.5px;
+            min-width: 1200px;
         }
 
         th {
-            background-color: #f8fafc;
-            color: #475569;
+            background: #f8fafc;
+            color: #1e293b;
             font-weight: 600;
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
         }
 
-        tr:hover {
-            background-color: #f1f5f9;
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eef2f6;
+            vertical-align: middle;
         }
 
-        .btn-delete {
-            background-color: #ef4444;
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        /* ===== BOTÕES DE AÇÃO ===== */
+        .acoes {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-baixa {
+            background: #ef4444;
             color: white;
-            padding: 6px 12px;
+            border: none;
+            padding: 6px 14px;
             font-size: 12px;
-            border-radius: 4px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-baixa:hover {
+            background: #dc2626;
+            transform: scale(1.04);
         }
 
-        .btn-delete:hover {
-            background-color: #dc2626;
+        .btn-reservar {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-reservar:hover {
+            background: #d97706;
+            transform: scale(1.04);
         }
 
-        /* Mensagens de erro / carregamento */
-        .mensagem {
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            font-weight: 500;
+        /* ===== STATUS COLORIDO ===== */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
-
-        .erro {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
-        }
-
-        .sucesso {
-            background-color: #dcfce7;
+        .status-disponivel {
+            background: #dcfce7;
             color: #166534;
-            border: 1px solid #bbf7d0;
+        }
+        .status-com-reserva {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+        .status-falta {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .status-indisponivel {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            animation: overlayIn 0.2s ease;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes overlayIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            background: white;
+            border-radius: 24px;
+            max-width: 480px;
+            width: 90%;
+            padding: 32px 28px 28px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+            animation: modalSlide 0.25s ease;
+        }
+
+        @keyframes modalSlide {
+            from {
+                transform: translateY(30px) scale(0.96);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0b1a33;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal h2 i {
+            color: #f59e0b;
+        }
+
+        .modal .sub {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        .modal .form-group {
+            margin-bottom: 16px;
+        }
+
+        .modal .form-group label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        .modal .form-group input {
+            width: 100%;
+        }
+
+        .modal .botoes-modal {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            justify-content: flex-end;
+        }
+
+        .modal .botoes-modal button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .modal .btn-cancelar {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+        .modal .btn-cancelar:hover {
+            background: #cbd5e1;
+        }
+
+        .modal .btn-confirmar {
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .modal .btn-confirmar:hover {
+            background: #1d4ed8;
+            transform: scale(1.02);
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 700px) {
+            .container {
+                padding: 16px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            form {
+                grid-template-columns: 1fr 1fr;
+                padding: 16px;
+            }
+            .btn-submit {
+                grid-column: 1 / -1;
+            }
+            .modal {
+                padding: 24px 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            form {
+                grid-template-columns: 1fr;
+            }
+            .acoes {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -196,17 +483,29 @@
 <body>
 
     <div class="container">
-        <h1>Gerenciador de Produtos</h1>
 
-        <!-- Controle de abas -->
-        <div class="tabs">
-            <button id="tab-visualizar-btn" class="tab-btn active">Visualizar / Deletar</button>
-            <button id="tab-inserir-btn" class="tab-btn">Inserir Novo Item</button>
+        <!-- ===== CABEÇALHO ===== -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-cut"></i>
+                CONTROLE DE CORTE DE FILMES E TELAS
+            </h1>
+            <span class="badge"><i class="fas fa-database"></i> Supabase</span>
         </div>
 
-        <!-- Aba: Visualizar -->
+        <!-- ===== ABAS ===== -->
+        <div class="tabs">
+            <button id="tab-visualizar-btn" class="tab-btn active">
+                <i class="fas fa-table"></i> Visualizar
+            </button>
+            <button id="tab-inserir-btn" class="tab-btn">
+                <i class="fas fa-plus-circle"></i> Inserir Novo
+            </button>
+        </div>
+
+        <!-- ===== ABA VISUALIZAR ===== -->
         <div id="visualizar" class="tab-content active">
-            <div id="mensagem-visualizar" class="mensagem" style="display:none;"></div>
+            <div id="mensagem-visualizar" class="mensagem"></div>
             <div class="table-responsive">
                 <table>
                     <thead>
@@ -222,25 +521,24 @@
                             <th>Reserva (m)</th>
                             <th>Saldo Livre</th>
                             <th>Status</th>
-                            <th>Observação</th>
+                            <th>Pedido</th>
+                            <th>Obs. Reserva</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="dados-tabela">
-                        <tr>
-                            <td colspan="13">Carregando dados do estoque...</td>
-                        </tr>
+                        <tr><td colspan="14">Carregando...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Aba: Inserir -->
+        <!-- ===== ABA INSERIR ===== -->
         <div id="inserir" class="tab-content">
-            <div id="mensagem-inserir" class="mensagem" style="display:none;"></div>
+            <div id="mensagem-inserir" class="mensagem"></div>
             <form id="produto-form">
                 <div class="form-group">
-                    <label for="descricao_do_produto">Descrição do Produto</label>
+                    <label for="descricao_do_produto">Descrição do Produto *</label>
                     <input type="text" id="descricao_do_produto" required />
                 </div>
                 <div class="form-group">
@@ -248,46 +546,71 @@
                     <input type="text" id="caracteristica" />
                 </div>
                 <div class="form-group">
-                    <label for="largura_mts">Largura (mts)</label>
+                    <label for="largura_mts">Largura (mts) *</label>
                     <input type="number" id="largura_mts" step="0.01" required />
                 </div>
                 <div class="form-group">
-                    <label for="comprim_mts">Comprimento (mts)</label>
+                    <label for="comprim_mts">Comprimento (mts) *</label>
                     <input type="number" id="comprim_mts" step="0.01" required />
                 </div>
                 <div class="form-group">
-                    <label for="qtde_rolos_un">Qtd Rolos (un)</label>
+                    <label for="qtde_rolos_un">Qtd Rolos (un) *</label>
                     <input type="number" id="qtde_rolos_un" required />
                 </div>
-                <div class="form-group">
-                    <label for="qtde_m2">Qtd m²</label>
-                    <input type="number" id="qtde_m2" step="0.01" required />
-                </div>
-                <div class="form-group">
-                    <label for="mts_lineares">Mts Lineares</label>
-                    <input type="number" id="mts_lineares" step="0.01" required />
-                </div>
+                <!-- Campos removidos: qtde_m2, mts_lineares, saldo_livre_mts (gerados pelo banco) -->
                 <div class="form-group">
                     <label for="reserva_mts">Reserva (mts)</label>
                     <input type="number" id="reserva_mts" step="0.01" value="0" />
                 </div>
                 <div class="form-group">
-                    <label for="saldo_livre_mts">Saldo Livre</label>
-                    <input type="number" id="saldo_livre_mts" step="0.01" required />
-                </div>
-                <div class="form-group">
                     <label for="status">Status</label>
                     <select id="status">
                         <option value="Disponível">Disponível</option>
+                        <option value="COM RESERVA">COM RESERVA</option>
                         <option value="Indisponível">Indisponível</option>
                     </select>
                 </div>
                 <div class="form-group" style="grid-column: span 2;">
-                    <label for="observacao">Observação</label>
+                    <label for="observacao">Observação Geral</label>
                     <input type="text" id="observacao" />
                 </div>
-                <button type="submit" class="btn-submit">Salvar Produto</button>
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-save"></i> Salvar Produto
+                </button>
             </form>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE RESERVA ===== -->
+    <div id="modal-reserva" class="modal-overlay">
+        <div class="modal">
+            <h2><i class="fas fa-hand-holding-heart"></i> Reservar Material</h2>
+            <div class="sub">Preencha os dados para reservar uma quantidade.</div>
+
+            <input type="hidden" id="reserva-produto-id" />
+
+            <div class="form-group">
+                <label for="reserva-pedido">Número do Pedido *</label>
+                <input type="text" id="reserva-pedido" placeholder="Ex: PED-2025-001" required />
+            </div>
+            <div class="form-group">
+                <label for="reserva-obs">Observação (opcional)</label>
+                <input type="text" id="reserva-obs" placeholder="Detalhes da reserva" />
+            </div>
+            <div class="form-group">
+                <label for="reserva-quantidade">Quantidade (metros lineares) *</label>
+                <input type="number" id="reserva-quantidade" step="0.01" min="0.01" placeholder="Ex: 5.00" required />
+            </div>
+            <div class="form-group" style="background: #f1f5f9; border-radius: 10px; padding: 10px 14px;">
+                <span style="font-size:13px; color:#475569;">
+                    <strong>Saldo livre atual:</strong> <span id="reserva-saldo-atual">0</span> m
+                </span>
+            </div>
+
+            <div class="botoes-modal">
+                <button class="btn-cancelar" id="btn-cancelar-reserva"><i class="fas fa-times"></i> Cancelar</button>
+                <button class="btn-confirmar" id="btn-confirmar-reserva"><i class="fas fa-check"></i> Confirmar Reserva</button>
+            </div>
         </div>
     </div>
 
@@ -296,14 +619,13 @@
             'use strict';
 
             // ============================================================
-            // 1. CONFIGURAÇÃO DO SUPABASE
+            // 1. CONFIGURAÇÃO SUPABASE
             // ============================================================
             const SUPABASE_URL = 'https://hbchbgymexmlbkyyydqu.supabase.co';
             const SUPABASE_ANON_KEY = 'sb_publishable_7p2JEkqrYIFG3dhuk_33yA_QMHxSiJt';
             const NOME_TABELA = 'produtos';
 
-            // Cria o cliente Supabase
-            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
             // ============================================================
             // 2. ELEMENTOS DOM
@@ -317,14 +639,23 @@
             const msgVisualizar = document.getElementById('mensagem-visualizar');
             const msgInserir = document.getElementById('mensagem-inserir');
 
+            // Modal
+            const modal = document.getElementById('modal-reserva');
+            const inputProdutoId = document.getElementById('reserva-produto-id');
+            const inputPedido = document.getElementById('reserva-pedido');
+            const inputObs = document.getElementById('reserva-obs');
+            const inputQuantidade = document.getElementById('reserva-quantidade');
+            const spanSaldoAtual = document.getElementById('reserva-saldo-atual');
+            const btnCancelar = document.getElementById('btn-cancelar-reserva');
+            const btnConfirmar = document.getElementById('btn-confirmar-reserva');
+
             // ============================================================
-            // 3. FUNÇÕES AUXILIARES (exibir mensagens)
+            // 3. FUNÇÕES AUXILIARES (mensagens)
             // ============================================================
             function exibirMensagem(elemento, texto, tipo) {
                 elemento.textContent = texto;
                 elemento.className = 'mensagem ' + tipo;
                 elemento.style.display = 'block';
-                // Oculta automaticamente após 5 segundos
                 clearTimeout(elemento._timeout);
                 elemento._timeout = setTimeout(() => {
                     elemento.style.display = 'none';
@@ -342,195 +673,7 @@
             }
 
             // ============================================================
-            // 4. CARREGAR DADOS (tabela)
-            // ============================================================
-            async function carregarDados() {
-                // Mostra loading
-                tbody.innerHTML = '<tr><td colspan="13">Carregando dados...</td></tr>';
-                msgVisualizar.style.display = 'none';
-
-                try {
-                    const { data, error } = await supabaseClient
-                        .from(NOME_TABELA)
-                        .select('*')
-                        .order('id', { ascending: true });
-
-                    if (error) {
-                        throw error;
-                    }
-
-                    if (!data || data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="13">Nenhum produto cadastrado.</td></tr>';
-                        return;
-                    }
-
-                    // Monta as linhas da tabela usando template strings
-                    let html = '';
-                    data.forEach(item => {
-                        html += `
-                            <tr>
-                                <td><b>${item.id}</b></td>
-                                <td>${escapeHTML(item.descricao_do_produto || '')}</td>
-                                <td>${escapeHTML(item.caracteristica || '')}</td>
-                                <td>${item.largura_mts ?? 0}</td>
-                                <td>${item.comprim_mts ?? 0}</td>
-                                <td>${item.qtde_rolos_un ?? 0}</td>
-                                <td>${item.qtde_m2 ?? 0}</td>
-                                <td>${item.mts_lineares ?? 0}</td>
-                                <td>${item.reserva_mts ?? 0}</td>
-                                <td>${item.saldo_livre_mts ?? 0}</td>
-                                <td>${escapeHTML(item.status || '')}</td>
-                                <td>${escapeHTML(item.observacao || '')}</td>
-                                <td>
-                                    <button class="btn-delete" data-id="${item.id}">Excluir</button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    tbody.innerHTML = html;
-
-                    // Associa eventos de clique nos botões "Excluir"
-                    document.querySelectorAll('.btn-delete').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const id = parseInt(this.getAttribute('data-id'), 10);
-                            deletarItem(id);
-                        });
-                    });
-
-                } catch (err) {
-                    console.error('Erro ao carregar dados:', err);
-                    tbody.innerHTML =
-                        `<tr><td colspan="13" style="color:red; font-weight:bold;">Erro ao carregar dados: ${escapeHTML(err.message || 'Erro desconhecido')}</td></tr>`;
-                    exibirErro(msgVisualizar, err);
-                }
-            }
-
-            // ============================================================
-            // 5. DELETAR ITEM
-            // ============================================================
-            async function deletarItem(id) {
-                if (!confirm(`Deseja excluir permanentemente o produto com ID ${id}?`)) {
-                    return;
-                }
-
-                try {
-                    const { error } = await supabaseClient
-                        .from(NOME_TABELA)
-                        .delete()
-                        .eq('id', id);
-
-                    if (error) {
-                        throw error;
-                    }
-
-                    exibirSucesso(msgVisualizar, `Produto ID ${id} excluído com sucesso!`);
-                    await carregarDados(); // recarrega a tabela
-                } catch (err) {
-                    console.error('Erro ao excluir:', err);
-                    exibirErro(msgVisualizar, err);
-                }
-            }
-
-            // ============================================================
-            // 6. INSERIR NOVO ITEM
-            // ============================================================
-            form.addEventListener('submit', async function(event) {
-                event.preventDefault();
-
-                // Coleta os valores do formulário
-                const descricao_do_produto = document.getElementById('descricao_do_produto').value.trim();
-                const caracteristica = document.getElementById('caracteristica').value.trim();
-                const largura_mts = parseFloat(document.getElementById('largura_mts').value);
-                const comprim_mts = parseFloat(document.getElementById('comprim_mts').value);
-                const qtde_rolos_un = parseInt(document.getElementById('qtde_rolos_un').value, 10);
-                const qtde_m2 = parseFloat(document.getElementById('qtde_m2').value);
-                const mts_lineares = parseFloat(document.getElementById('mts_lineares').value);
-                const reserva_mts = parseFloat(document.getElementById('reserva_mts').value) || 0;
-                const saldo_livre_mts = parseFloat(document.getElementById('saldo_livre_mts').value);
-                const status = document.getElementById('status').value;
-                const observacao = document.getElementById('observacao').value.trim();
-
-                // Validação simples (os campos com 'required' já são validados pelo HTML)
-                if (!descricao_do_produto) {
-                    exibirErro(msgInserir, 'A descrição do produto é obrigatória.');
-                    return;
-                }
-
-                const novoItem = {
-                    descricao_do_produto,
-                    caracteristica,
-                    largura_mts,
-                    comprim_mts,
-                    qtde_rolos_un,
-                    // qtde_m2,
-                    // mts_lineares,
-                    reserva_mts,
-                    // saldo_livre_mts,
-                    status,
-                    observacao
-                };
-
-                try {
-                    const { data, error } = await supabaseClient
-                        .from(NOME_TABELA)
-                        .insert([novoItem])
-                        .select(); // para obter o registro inserido (opcional)
-
-                    if (error) {
-                        throw error;
-                    }
-
-                    exibirSucesso(msgInserir, 'Produto cadastrado com sucesso!');
-                    form.reset(); // limpa o formulário
-                    // Volta para a aba Visualizar e recarrega os dados
-                    switchTab('visualizar');
-                    await carregarDados();
-
-                } catch (err) {
-                    console.error('Erro ao inserir:', err);
-                    exibirErro(msgInserir, err);
-                }
-            });
-
-            // ============================================================
-            // 7. TROCA DE ABAS
-            // ============================================================
-            function switchTab(tabId) {
-                // Esconde todas as abas
-                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-                document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
-                if (tabId === 'visualizar') {
-                    tabVisualizar.classList.add('active');
-                    btnVisualizar.classList.add('active');
-                    // Recarrega os dados ao entrar na aba
-                    carregarDados();
-                } else if (tabId === 'inserir') {
-                    tabInserir.classList.add('active');
-                    btnInserir.classList.add('active');
-                    // Limpa mensagens da aba de inserção
-                    msgInserir.style.display = 'none';
-                }
-            }
-
-            // Eventos das abas
-            btnVisualizar.addEventListener('click', function() {
-                switchTab('visualizar');
-            });
-            btnInserir.addEventListener('click', function() {
-                switchTab('inserir');
-            });
-
-            // ============================================================
-            // 8. INICIALIZAÇÃO
-            // ============================================================
-            window.addEventListener('load', function() {
-                // Inicia na aba Visualizar (já está ativa por padrão)
-                carregarDados();
-            });
-
-            // ============================================================
-            // 9. UTILITÁRIO: escapeHTML para evitar XSS
+            // 4. ESCAPE HTML
             // ============================================================
             function escapeHTML(str) {
                 if (!str) return '';
@@ -543,7 +686,284 @@
                 });
             }
 
-            // Exporta funções para uso global (caso necessário)
+            // ============================================================
+            // 5. CARREGAR DADOS
+            // ============================================================
+            async function carregarDados() {
+                tbody.innerHTML = '<tr><td colspan="14">Carregando dados...</td></tr>';
+                msgVisualizar.style.display = 'none';
+
+                try {
+                    const { data, error } = await supabase
+                        .from(NOME_TABELA)
+                        .select('*')
+                        .order('id', { ascending: true });
+
+                    if (error) throw error;
+
+                    if (!data || data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="14">Nenhum produto cadastrado.</td></tr>';
+                        return;
+                    }
+
+                    let html = '';
+                    data.forEach(item => {
+                        // Define a classe CSS para o status
+                        let statusClass = 'status-indisponivel';
+                        if (item.status === 'Disponível') statusClass = 'status-disponivel';
+                        else if (item.status === 'COM RESERVA') statusClass = 'status-com-reserva';
+                        else if (item.status === 'Falta') statusClass = 'status-falta';
+
+                        html += `
+                            <tr>
+                                <td><b>${item.id}</b></td>
+                                <td>${escapeHTML(item.descricao_do_produto || '')}</td>
+                                <td>${escapeHTML(item.caracteristica || '')}</td>
+                                <td>${item.largura_mts ?? 0}</td>
+                                <td>${item.comprim_mts ?? 0}</td>
+                                <td>${item.qtde_rolos_un ?? 0}</td>
+                                <td>${item.qtde_m2 ?? 0}</td>
+                                <td>${item.mts_lineares ?? 0}</td>
+                                <td>${item.reserva_mts ?? 0}</td>
+                                <td>${item.saldo_livre_mts ?? 0}</td>
+                                <td><span class="status-badge ${statusClass}">${escapeHTML(item.status || '')}</span></td>
+                                <td>${escapeHTML(item.pedido || '')}</td>
+                                <td>${escapeHTML(item.obs_reserva || '')}</td>
+                                <td>
+                                    <div class="acoes">
+                                        <button class="btn-baixa" data-id="${item.id}">
+                                            <i class="fas fa-trash-alt"></i> BAIXA
+                                        </button>
+                                        <button class="btn-reservar" data-id="${item.id}" data-saldo="${item.saldo_livre_mts ?? 0}">
+                                            <i class="fas fa-hand-holding-heart"></i> RESERVAR
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    tbody.innerHTML = html;
+
+                    // Eventos dos botões BAIXA
+                    document.querySelectorAll('.btn-baixa').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = parseInt(this.dataset.id, 10);
+                            deletarItem(id);
+                        });
+                    });
+
+                    // Eventos dos botões RESERVAR
+                    document.querySelectorAll('.btn-reservar').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = parseInt(this.dataset.id, 10);
+                            const saldo = parseFloat(this.dataset.saldo) || 0;
+                            abrirModalReserva(id, saldo);
+                        });
+                    });
+
+                } catch (err) {
+                    console.error('Erro ao carregar dados:', err);
+                    tbody.innerHTML =
+                        `<tr><td colspan="14" style="color:red; font-weight:bold;">Erro ao carregar dados: ${escapeHTML(err.message || 'Erro desconhecido')}</td></tr>`;
+                    exibirErro(msgVisualizar, err);
+                }
+            }
+
+            // ============================================================
+            // 6. DELETAR (BAIXA)
+            // ============================================================
+            async function deletarItem(id) {
+                if (!confirm(`Deseja realmente dar BAIXA (excluir) no produto ID ${id}?`)) return;
+
+                try {
+                    const { error } = await supabase
+                        .from(NOME_TABELA)
+                        .delete()
+                        .eq('id', id);
+
+                    if (error) throw error;
+
+                    exibirSucesso(msgVisualizar, `Produto ID ${id} removido com sucesso!`);
+                    await carregarDados();
+                } catch (err) {
+                    console.error('Erro ao excluir:', err);
+                    exibirErro(msgVisualizar, err);
+                }
+            }
+
+            // ============================================================
+            // 7. MODAL DE RESERVA
+            // ============================================================
+            let produtoIdAtual = null;
+
+            function abrirModalReserva(id, saldoAtual) {
+                produtoIdAtual = id;
+                inputProdutoId.value = id;
+                spanSaldoAtual.textContent = saldoAtual.toFixed(2);
+                inputPedido.value = '';
+                inputObs.value = '';
+                inputQuantidade.value = '';
+                modal.classList.add('active');
+                inputPedido.focus();
+            }
+
+            function fecharModalReserva() {
+                modal.classList.remove('active');
+                produtoIdAtual = null;
+            }
+
+            // Cancelar
+            btnCancelar.addEventListener('click', fecharModalReserva);
+
+            // Clicar fora do modal fecha
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) fecharModalReserva();
+            });
+
+            // Confirmar reserva
+            btnConfirmar.addEventListener('click', async function() {
+                const id = parseInt(inputProdutoId.value, 10);
+                const pedido = inputPedido.value.trim();
+                const obs = inputObs.value.trim();
+                const quantidade = parseFloat(inputQuantidade.value);
+
+                // Validações
+                if (!pedido) {
+                    alert('O número do pedido é obrigatório.');
+                    inputPedido.focus();
+                    return;
+                }
+                if (!quantidade || quantidade <= 0) {
+                    alert('Informe uma quantidade válida (maior que zero).');
+                    inputQuantidade.focus();
+                    return;
+                }
+
+                // Saldo atual (pego do span)
+                const saldoAtual = parseFloat(spanSaldoAtual.textContent) || 0;
+                if (quantidade > saldoAtual) {
+                    alert(`Saldo insuficiente! Disponível: ${saldoAtual.toFixed(2)} m.`);
+                    inputQuantidade.focus();
+                    return;
+                }
+
+                try {
+                    // Buscar o registro atual para obter reserva_mts atual
+                    const { data: [item], error: fetchError } = await supabase
+                        .from(NOME_TABELA)
+                        .select('reserva_mts')
+                        .eq('id', id)
+                        .limit(1);
+
+                    if (fetchError) throw fetchError;
+                    if (!item) throw new Error('Produto não encontrado.');
+
+                    const reservaAtual = item.reserva_mts || 0;
+                    const novaReserva = reservaAtual + quantidade;
+
+                    // Atualizar: reserva_mts, status, pedido, obs_reserva
+                    const { error: updateError } = await supabase
+                        .from(NOME_TABELA)
+                        .update({
+                            reserva_mts: novaReserva,
+                            status: 'COM RESERVA',
+                            pedido: pedido,
+                            obs_reserva: obs || null
+                        })
+                        .eq('id', id);
+
+                    if (updateError) throw updateError;
+
+                    exibirSucesso(msgVisualizar, `Reserva realizada! ${quantidade.toFixed(2)} m reservados.`);
+                    fecharModalReserva();
+                    await carregarDados();
+
+                } catch (err) {
+                    console.error('Erro ao reservar:', err);
+                    alert('Erro ao realizar reserva: ' + (err.message || 'Erro desconhecido.'));
+                }
+            });
+
+            // ============================================================
+            // 8. INSERIR NOVO ITEM
+            // ============================================================
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const descricao_do_produto = document.getElementById('descricao_do_produto').value.trim();
+                const caracteristica = document.getElementById('caracteristica').value.trim();
+                const largura_mts = parseFloat(document.getElementById('largura_mts').value);
+                const comprim_mts = parseFloat(document.getElementById('comprim_mts').value);
+                const qtde_rolos_un = parseInt(document.getElementById('qtde_rolos_un').value, 10);
+                const reserva_mts = parseFloat(document.getElementById('reserva_mts').value) || 0;
+                const status = document.getElementById('status').value;
+                const observacao = document.getElementById('observacao').value.trim();
+
+                if (!descricao_do_produto) {
+                    exibirErro(msgInserir, 'A descrição do produto é obrigatória.');
+                    return;
+                }
+
+                const novoItem = {
+                    descricao_do_produto,
+                    caracteristica,
+                    largura_mts,
+                    comprim_mts,
+                    qtde_rolos_un,
+                    reserva_mts,
+                    status,
+                    observacao
+                    // qtde_m2, mts_lineares, saldo_livre_mts são gerados pelo banco
+                };
+
+                try {
+                    const { error } = await supabase
+                        .from(NOME_TABELA)
+                        .insert([novoItem]);
+
+                    if (error) throw error;
+
+                    exibirSucesso(msgInserir, 'Produto cadastrado com sucesso!');
+                    form.reset();
+                    document.getElementById('reserva_mts').value = '0';
+                    document.getElementById('status').value = 'Disponível';
+                    switchTab('visualizar');
+                    await carregarDados();
+                } catch (err) {
+                    console.error('Erro ao inserir:', err);
+                    exibirErro(msgInserir, err);
+                }
+            });
+
+            // ============================================================
+            // 9. TROCA DE ABAS
+            // ============================================================
+            function switchTab(tabId) {
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+                if (tabId === 'visualizar') {
+                    tabVisualizar.classList.add('active');
+                    btnVisualizar.classList.add('active');
+                    carregarDados();
+                } else if (tabId === 'inserir') {
+                    tabInserir.classList.add('active');
+                    btnInserir.classList.add('active');
+                    msgInserir.style.display = 'none';
+                }
+            }
+
+            btnVisualizar.addEventListener('click', () => switchTab('visualizar'));
+            btnInserir.addEventListener('click', () => switchTab('inserir'));
+
+            // ============================================================
+            // 10. INICIALIZAÇÃO
+            // ============================================================
+            window.addEventListener('load', function() {
+                carregarDados();
+            });
+
+            // Exportar funções globais (para uso em eventos inline, se necessário)
             window.switchTab = switchTab;
             window.carregarDados = carregarDados;
             window.deletarItem = deletarItem;
