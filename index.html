@@ -39,7 +39,7 @@
             color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            padding: 24px 16px 48px;
+            padding: 20px 10px 48px;
         }
 
         /* ── HEADER ─────────────────────────────── */
@@ -130,48 +130,62 @@
 
         /* ── TABLE ──────────────────────────────── */
         .table-responsive {
-            overflow-x: auto;
+            overflow-x: hidden;
             border: 1px solid var(--border);
             border-radius: var(--radius);
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1100px;
-            font-size: 13px;
+            font-size: 12px;
+            table-layout: fixed;
         }
+        /* Larguras das colunas: ID, Descrição, Caract, Larg, Comp, Rolos, m², MtsLin, Reserva, Saldo, Status, Obs, Ações */
+        col.c-id      { width: 42px; }
+        col.c-desc    { width: 14%; }
+        col.c-caract  { width: 10%; }
+        col.c-num     { width: 6%; }
+        col.c-status  { width: 9%; }
+        col.c-obs     { width: 10%; }
+        col.c-acoes   { width: 130px; }
+
         thead th {
-            padding: 12px 14px;
+            padding: 10px 8px;
             text-align: left;
             background: var(--surface2);
             color: var(--text-muted);
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         tbody td {
-            padding: 13px 14px;
+            padding: 10px 8px;
             border-bottom: 1px solid var(--border);
             color: var(--text-primary);
             vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         tbody tr:last-child td { border-bottom: none; }
         tbody tr:hover td { background: var(--surface2); }
 
         .id-cell {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
         }
         .num-cell {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
         }
-        .bold-cell { font-weight: 600; }
+        .bold-cell { font-weight: 600; font-size: 12px; }
 
         /* ── STATUS BADGES ──────────────────────── */
         .badge {
@@ -221,11 +235,11 @@
             background: var(--red-bg);
             color: var(--red);
             border: 1px solid var(--red-border);
-            padding: 6px 12px;
-            font-size: 11px;
+            padding: 5px 8px;
+            font-size: 10px;
             font-weight: 700;
             border-radius: var(--radius-sm);
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
         }
         .btn-baixa:hover {
@@ -236,11 +250,11 @@
             background: var(--yellow-bg);
             color: var(--yellow);
             border: 1px solid var(--yellow-border);
-            padding: 6px 12px;
-            font-size: 11px;
+            padding: 5px 8px;
+            font-size: 10px;
             font-weight: 700;
             border-radius: var(--radius-sm);
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
         }
         .btn-reservar:hover {
@@ -724,20 +738,35 @@
             <div id="mensagem-visualizar" class="mensagem"></div>
             <div class="table-responsive">
                 <table>
+                    <colgroup>
+                        <col class="c-id">
+                        <col class="c-desc">
+                        <col class="c-caract">
+                        <col class="c-num">
+                        <col class="c-num">
+                        <col class="c-num">
+                        <col class="c-num">
+                        <col class="c-num">
+                        <col class="c-num">
+                        <col class="c-num">
+                        <col class="c-status">
+                        <col class="c-obs">
+                        <col class="c-acoes">
+                    </colgroup>
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Descrição</th>
-                            <th>Característica</th>
-                            <th>Largura (m)</th>
-                            <th>Compr. (m)</th>
-                            <th>Qtd Rolos</th>
-                            <th>Qtd m²</th>
-                            <th>Mts Lineares</th>
-                            <th>Reserva (m)</th>
-                            <th>Saldo Livre</th>
+                            <th>Caract.</th>
+                            <th>Larg (m)</th>
+                            <th>Comp (m)</th>
+                            <th>Rolos</th>
+                            <th>m²</th>
+                            <th>Mts Lin</th>
+                            <th>Reserva</th>
+                            <th>Saldo</th>
                             <th>Status</th>
-                            <th>Observação</th>
+                            <th>Obs</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
