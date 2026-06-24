@@ -598,6 +598,78 @@
         }
         .no-reserva-card .icon { font-size: 28px; margin-bottom: 8px; }
 
+        /* Tabela de reservas no drawer */
+        .reservas-table-wrap {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .reservas-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .reservas-table thead th {
+            background: var(--surface2);
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 9px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        .reservas-table tbody td {
+            padding: 10px 10px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+        .reservas-table tbody tr:last-child td { border-bottom: none; }
+        .reservas-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+        .reservas-table .td-pedido {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--yellow);
+            font-weight: 600;
+            font-size: 12px;
+        }
+        .reservas-table .td-mts {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+        .reservas-table .td-obs {
+            color: var(--text-secondary);
+            font-size: 11px;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .reservas-table .td-data {
+            color: var(--text-muted);
+            font-size: 10px;
+            white-space: nowrap;
+        }
+        .btn-remover-linha {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid var(--red-border);
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 4px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .btn-remover-linha:hover { background: var(--red); color: #fff; }
+        .btn-remover-linha:disabled { opacity: 0.4; cursor: not-allowed; }
+
         .btn-remover-reserva {
             width: 100%;
             background: var(--red-bg);
@@ -966,7 +1038,7 @@
         const drawer        = document.getElementById('drawer');
         let drawerItemAtual = null;
 
-        function abrirDrawer(item) {
+        async function abrirDrawer(item) {
             drawerItemAtual = item;
 
             document.getElementById('drawer-titulo').textContent    = item.descricao_do_produto || '—';
@@ -987,43 +1059,83 @@
                 obsWrapper.style.display = 'none';
             }
 
-            // Reserva ativa
-            const container = document.getElementById('dw-reserva-ativa');
-            if (item.pedido) {
-                container.innerHTML = `
-                    <div class="reserva-card">
-                        <div class="reserva-card-header">
-                            <span class="tag">● Reserva em aberto</span>
-                        </div>
-                        <div class="reserva-field">
-                            <div class="rf-lbl">Nº do Pedido</div>
-                            <div class="rf-val mono">${escapeHTML(item.pedido)}</div>
-                        </div>
-                        <div class="reserva-field">
-                            <div class="rf-lbl">Metros Reservados</div>
-                            <div class="rf-val mono">${item.reserva_mts ?? 0} m lineares</div>
-                        </div>
-                        ${item.obs_reserva ? `
-                        <div class="reserva-field">
-                            <div class="rf-lbl">Observação</div>
-                            <div class="rf-val">${escapeHTML(item.obs_reserva)}</div>
-                        </div>` : ''}
-                        <button class="btn-remover-reserva" id="btn-remover-reserva">
-                            🗑 Remover Reserva
-                        </button>
-                    </div>`;
-
-                document.getElementById('btn-remover-reserva').addEventListener('click', () => removerReserva(item.id));
-            } else {
-                container.innerHTML = `
-                    <div class="no-reserva-card">
-                        <div class="icon">📭</div>
-                        Nenhuma reserva ativa para este produto.
-                    </div>`;
-            }
-
             drawerOverlay.classList.add('open');
             drawer.classList.add('open');
+
+            // Carrega reservas da tabela reservas
+            await carregarReservasDrawer(item.id);
+        }
+
+        async function carregarReservasDrawer(produtoId) {
+            const container = document.getElementById('dw-reserva-ativa');
+            container.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:8px 0;">Carregando reservas...</div>';
+
+            try {
+                const { data, error } = await sb
+                    .from('reservas')
+                    .select('*')
+                    .eq('produto_id', produtoId)
+                    .order('criado_em', { ascending: true });
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-reserva-card">
+                            <div class="icon">📭</div>
+                            Nenhuma reserva ativa para este produto.
+                        </div>`;
+                    return;
+                }
+
+                // Formata data
+                const fmtData = (iso) => {
+                    if (!iso) return '—';
+                    const d = new Date(iso);
+                    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+                };
+
+                let rows = data.map(r => `
+                    <tr>
+                        <td class="td-pedido">${escapeHTML(r.pedido)}</td>
+                        <td class="td-mts">${r.reserva_mts} m</td>
+                        <td class="td-obs" title="${escapeHTML(r.obs_reserva || '')}">${escapeHTML(r.obs_reserva || '—')}</td>
+                        <td class="td-data">${fmtData(r.criado_em)}</td>
+                        <td>
+                            <button class="btn-remover-linha" data-reserva-id="${r.id}" data-produto-id="${r.produto_id}" data-mts="${r.reserva_mts}">
+                                🗑 Remover
+                            </button>
+                        </td>
+                    </tr>`).join('');
+
+                container.innerHTML = `
+                    <div class="reservas-table-wrap">
+                        <table class="reservas-table">
+                            <thead>
+                                <tr>
+                                    <th>Pedido</th>
+                                    <th>Metros</th>
+                                    <th>Observação</th>
+                                    <th>Data</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>`;
+
+                // Eventos dos botões remover por linha
+                container.querySelectorAll('.btn-remover-linha').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const reservaId = parseInt(btn.dataset.reservaId, 10);
+                        const prodId    = parseInt(btn.dataset.produtoId, 10);
+                        const mtsRes    = parseFloat(btn.dataset.mts);
+                        await removerReservaLinha(reservaId, prodId, mtsRes, btn);
+                    });
+                });
+
+            } catch (err) {
+                container.innerHTML = `<div style="color:var(--red);font-size:12px;">Erro ao carregar reservas: ${escapeHTML(err.message)}</div>`;
+            }
         }
 
         function fecharDrawer() {
@@ -1032,24 +1144,50 @@
             drawerItemAtual = null;
         }
 
-        async function removerReserva(id) {
-            if (!confirm('Confirmar remoção da reserva? O saldo será restaurado.')) return;
-            const btn = document.getElementById('btn-remover-reserva');
-            if (btn) { btn.disabled = true; btn.textContent = 'Removendo…'; }
+        async function removerReservaLinha(reservaId, produtoId, mtsReservados, btn) {
+            if (!confirm(`Remover esta reserva de ${mtsReservados} m? O saldo será restaurado.`)) return;
+            btn.disabled = true;
+            btn.textContent = '…';
             try {
-                const { error } = await sb.from(NOME_TABELA).update({
-                    reserva_mts:  0,
-                    status:       'Disponível',
-                    pedido:       null,
-                    obs_reserva:  null
-                }).eq('id', id);
-                if (error) throw error;
-                fecharDrawer();
-                exibirSucesso(msgVisualizar, 'Reserva removida com sucesso!');
+                // 1. Remove a linha da tabela reservas
+                const { error: errDel } = await sb.from('reservas').delete().eq('id', reservaId);
+                if (errDel) throw errDel;
+
+                // 2. Verifica se ainda existem reservas para o produto
+                const { data: restantes, error: errChk } = await sb
+                    .from('reservas')
+                    .select('id, reserva_mts')
+                    .eq('produto_id', produtoId);
+                if (errChk) throw errChk;
+
+                // 3. Recalcula reserva_mts total e atualiza status na tabela produtos
+                const totalRestante = restantes.reduce((acc, r) => acc + parseFloat(r.reserva_mts), 0);
+                const novoStatus    = totalRestante > 0 ? 'Com Reserva' : 'Disponível';
+
+                const { error: errUpd } = await sb.from(NOME_TABELA).update({
+                    reserva_mts: totalRestante,
+                    status:      novoStatus,
+                    pedido:      restantes.length > 0 ? (restantes[restantes.length - 1].pedido || null) : null,
+                    obs_reserva: null
+                }).eq('id', produtoId);
+                if (errUpd) throw errUpd;
+
+                exibirSucesso(msgVisualizar, `Reserva removida. ${novoStatus === 'Disponível' ? 'Produto agora Disponível.' : 'Outras reservas mantidas.'}`);
+
+                // Recarrega reservas no drawer e a tabela principal
+                await carregarReservasDrawer(produtoId);
                 await carregarDados();
+
+                // Atualiza saldo no drawer (pega item atualizado)
+                const { data: prodAtual } = await sb.from(NOME_TABELA).select('saldo_livre_mts, reserva_mts').eq('id', produtoId).single();
+                if (prodAtual) {
+                    document.getElementById('dw-saldo').textContent = (prodAtual.saldo_livre_mts ?? '—') + ' m';
+                }
+
             } catch (err) {
                 exibirErro(msgVisualizar, err);
-                if (btn) { btn.disabled = false; btn.textContent = '🗑 Remover Reserva'; }
+                btn.disabled = false;
+                btn.textContent = '🗑 Remover';
             }
         }
 
@@ -1086,7 +1224,6 @@
             const mts    = parseFloat(modalMts.value);
             const obs    = modalObs.value.trim();
 
-            // Validações
             if (!pedido) {
                 exibirMensagem(modalErro, '❌ O número do pedido é obrigatório.', 'erro');
                 modalErro.style.display = 'block';
@@ -1110,16 +1247,24 @@
             btnModalConfirm.textContent = 'Salvando…';
 
             try {
-                const novaReserva = reservaItemAtual.reserva + mts;
+                // 1. Insere na tabela reservas
+                const { error: errIns } = await sb.from('reservas').insert([{
+                    produto_id:  reservaItemAtual.id,
+                    pedido:      pedido,
+                    reserva_mts: mts,
+                    obs_reserva: obs || null
+                }]);
+                if (errIns) throw errIns;
 
-                const { error } = await sb.from(NOME_TABELA).update({
-                    reserva_mts:  novaReserva,
-                    status:       'Com Reserva',
-                    pedido:       pedido,
-                    obs_reserva:  obs || null
+                // 2. Atualiza reserva_mts acumulado e status na tabela produtos
+                const novaReservaTotal = reservaItemAtual.reserva + mts;
+                const { error: errUpd } = await sb.from(NOME_TABELA).update({
+                    reserva_mts: novaReservaTotal,
+                    status:      'Com Reserva',
+                    pedido:      pedido,
+                    obs_reserva: obs || null
                 }).eq('id', reservaItemAtual.id);
-
-                if (error) throw error;
+                if (errUpd) throw errUpd;
 
                 fecharModal();
                 exibirSucesso(msgVisualizar, `Reserva de ${mts} m registrada para o pedido "${pedido}".`);
