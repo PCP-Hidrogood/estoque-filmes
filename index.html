@@ -741,15 +741,13 @@
             btnModalConfirm.textContent = 'Salvando…';
 
             try {
-                const novaReserva  = reservaItemAtual.reserva + mts;
-                const novoSaldo    = parseFloat((reservaItemAtual.saldo - mts).toFixed(4));
+                const novaReserva = reservaItemAtual.reserva + mts;
 
                 const { error } = await sb.from(NOME_TABELA).update({
-                    reserva_mts:    novaReserva,
-                    saldo_livre_mts: novoSaldo,
-                    status:         'Com Reserva',
-                    pedido:         pedido,
-                    obs_reserva:    obs || null
+                    reserva_mts:  novaReserva,
+                    status:       'Com Reserva',
+                    pedido:       pedido,
+                    obs_reserva:  obs || null
                 }).eq('id', reservaItemAtual.id);
 
                 if (error) throw error;
