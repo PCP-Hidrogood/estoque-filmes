@@ -526,10 +526,6 @@
                         <input type="number" id="qtde_rolos_un" required />
                     </div>
                     <div class="form-group">
-                        <label for="qtde_m2">Qtd m²</label>
-                        <input type="number" id="qtde_m2" step="0.01" required />
-                    </div>
-                    <div class="form-group">
                         <label for="mts_lineares">Mts Lineares</label>
                         <input type="number" id="mts_lineares" step="0.01" required />
                     </div>
@@ -537,10 +533,7 @@
                         <label for="reserva_mts">Reserva (mts)</label>
                         <input type="number" id="reserva_mts" step="0.01" value="0" />
                     </div>
-                    <div class="form-group">
-                        <label for="saldo_livre_mts">Saldo Livre</label>
-                        <input type="number" id="saldo_livre_mts" step="0.01" required />
-                    </div>
+                    <!-- qtde_m2 e saldo_livre_mts são calculados automaticamente pelo banco -->
                     <div class="form-group">
                         <label for="status">Status</label>
                         <select id="status">
@@ -773,13 +766,12 @@
                 largura_mts:          parseFloat(document.getElementById('largura_mts').value),
                 comprim_mts:          parseFloat(document.getElementById('comprim_mts').value),
                 qtde_rolos_un:        parseInt(document.getElementById('qtde_rolos_un').value, 10),
-                qtde_m2:              parseFloat(document.getElementById('qtde_m2').value),
                 mts_lineares:         parseFloat(document.getElementById('mts_lineares').value),
                 reserva_mts:          parseFloat(document.getElementById('reserva_mts').value) || 0,
-                saldo_livre_mts:      parseFloat(document.getElementById('saldo_livre_mts').value),
                 status:               document.getElementById('status').value,
                 observacao:           document.getElementById('observacao').value.trim()
             };
+            // qtde_m2 e saldo_livre_mts são colunas geradas pelo banco (calculadas automaticamente)
             if (!novoItem.descricao_do_produto) {
                 exibirErro(msgInserir, 'A descrição do produto é obrigatória.');
                 return;
