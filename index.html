@@ -4,435 +4,474 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Controle de Corte de Filmes e Telas</title>
-
-    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
-        /* (mesmo CSS anterior – mantido) */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #22263a;
+            --border: #2e3347;
+            --border-light: #3a4060;
+            --accent: #4f7cff;
+            --accent-hover: #3a65e8;
+            --accent-glow: rgba(79,124,255,0.18);
+            --text-primary: #e8eaf2;
+            --text-secondary: #8890a8;
+            --text-muted: #555e7a;
+            --green: #22c55e;
+            --green-bg: rgba(34,197,94,0.12);
+            --green-border: rgba(34,197,94,0.3);
+            --yellow: #f59e0b;
+            --yellow-bg: rgba(245,158,11,0.12);
+            --yellow-border: rgba(245,158,11,0.3);
+            --red: #ef4444;
+            --red-bg: rgba(239,68,68,0.12);
+            --red-border: rgba(239,68,68,0.3);
+            --radius: 10px;
+            --radius-sm: 6px;
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-            background: #f0f4f8;
-            padding: 24px;
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 24px 16px 48px;
         }
-        .container {
-            max-width: 1400px;
-            width: 100%;
-            background: white;
-            border-radius: 20px;
-            padding: 30px 32px 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-        }
+
+        /* ── HEADER ─────────────────────────────── */
         .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            margin-bottom: 28px;
-            border-bottom: 2px solid #e9edf2;
-            padding-bottom: 20px;
+            text-align: center;
+            margin-bottom: 32px;
         }
-        .header h1 {
-            font-size: 26px;
+        .header-eyebrow {
+            font-size: 11px;
             font-weight: 700;
-            color: #0b1a33;
-            letter-spacing: -0.3px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .header h1 i {
-            color: #2563eb;
-            font-size: 28px;
-        }
-        .header .badge {
-            background: #2563eb;
-            color: white;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 6px 16px;
-            border-radius: 30px;
-            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
-        }
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 2px;
-        }
-        .tab-btn {
-            padding: 10px 24px;
-            border: none;
-            background: transparent;
-            font-size: 15px;
-            font-weight: 600;
-            color: #64748b;
-            cursor: pointer;
-            border-radius: 8px 8px 0 0;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .tab-btn:hover {
-            background: #f1f5f9;
-            color: #1e293b;
-        }
-        .tab-btn.active {
-            color: #2563eb;
-            background: #eff6ff;
-            border-bottom: 3px solid #2563eb;
-        }
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.25s ease;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .mensagem {
-            padding: 14px 18px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            font-weight: 500;
-            display: none;
-        }
-        .erro {
-            background: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
-        }
-        .sucesso {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-        }
-        form {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-            gap: 18px 20px;
-            background: #fafcff;
-            padding: 24px;
-            border-radius: 16px;
-            border: 1px solid #e9edf2;
+            letter-spacing: 0.18em;
+            color: var(--accent);
+            text-transform: uppercase;
             margin-bottom: 10px;
         }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+        .header h1 {
+            font-size: clamp(20px, 3vw, 32px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            line-height: 1.15;
         }
-        .form-group label {
+        .header h1 span {
+            background: linear-gradient(90deg, #4f7cff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header-line {
+            width: 48px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), #a78bfa);
+            border-radius: 99px;
+            margin: 16px auto 0;
+        }
+
+        /* ── CONTAINER ──────────────────────────── */
+        .container {
+            max-width: 1380px;
+            margin: 0 auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        /* ── TABS ───────────────────────────────── */
+        .tabs {
+            display: flex;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+        }
+        .tab-btn {
+            padding: 16px 22px;
+            border: none;
+            background: none;
             font-size: 13px;
             font-weight: 600;
-            color: #334155;
-            letter-spacing: 0.2px;
-        }
-        .form-group input,
-        .form-group select {
-            padding: 10px 14px;
-            border: 1.5px solid #d1d9e6;
-            border-radius: 10px;
-            font-size: 14px;
-            transition: 0.15s;
-            background: white;
-            outline: none;
-        }
-        .form-group input:focus,
-        .form-group select:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-        }
-        .btn-submit {
-            grid-column: 1 / -1;
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
-            border: none;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 12px;
             cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            color: var(--text-muted);
+            letter-spacing: 0.03em;
+            transition: color 0.2s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            font-family: 'Inter', sans-serif;
         }
-        .btn-submit:hover {
-            transform: scale(1.01);
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+        .tab-btn:hover { color: var(--text-secondary); }
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
         }
+
+        /* ── TAB CONTENT ────────────────────────── */
+        .tab-content { display: none; padding: 24px; }
+        .tab-content.active { display: block; }
+
+        /* ── MESSAGES ───────────────────────────── */
+        .mensagem {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 18px;
+            font-weight: 500;
+            font-size: 13px;
+            display: none;
+        }
+        .erro { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+        .sucesso { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+
+        /* ── TABLE ──────────────────────────────── */
         .table-responsive {
             overflow-x: auto;
-            border-radius: 14px;
-            border: 1px solid #e2e8f0;
-            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13.5px;
-            min-width: 1200px;
+            min-width: 1100px;
+            font-size: 13px;
         }
-        th {
-            background: #f8fafc;
-            color: #1e293b;
-            font-weight: 600;
-            padding: 14px 12px;
+        thead th {
+            padding: 12px 14px;
             text-align: left;
-            border-bottom: 2px solid #e2e8f0;
+            background: var(--surface2);
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
             white-space: nowrap;
         }
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #eef2f6;
+        tbody td {
+            padding: 13px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
             vertical-align: middle;
         }
-        tr:last-child td {
-            border-bottom: none;
-        }
-        tr:hover td {
-            background: #f8fafc;
-        }
-        .acoes {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .btn-baixa {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 6px 14px;
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: var(--surface2); }
+
+        .id-cell {
+            font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.15s;
+            color: var(--text-muted);
+        }
+        .num-cell {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .bold-cell { font-weight: 600; }
+
+        /* ── STATUS BADGES ──────────────────────── */
+        .badge {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .badge-disponivel {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid var(--green-border);
+        }
+        .badge-disponivel::before { background: var(--green); }
+        .badge-reserva {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+            border: 1px solid var(--yellow-border);
+        }
+        .badge-reserva::before { background: var(--yellow); }
+        .badge-falta {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid var(--red-border);
+        }
+        .badge-falta::before { background: var(--red); }
+        .badge-default {
+            background: var(--surface2);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .badge-default::before { background: var(--text-muted); }
+
+        /* ── ACTION BUTTONS ─────────────────────── */
+        .actions { display: flex; gap: 6px; align-items: center; }
+
+        button { font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; }
+
+        .btn-baixa {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid var(--red-border);
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
         .btn-baixa:hover {
-            background: #dc2626;
-            transform: scale(1.04);
+            background: var(--red);
+            color: #fff;
         }
         .btn-reservar {
-            background: #f59e0b;
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.15s;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
+            background: var(--yellow-bg);
+            color: var(--yellow);
+            border: 1px solid var(--yellow-border);
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
         .btn-reservar:hover {
-            background: #d97706;
-            transform: scale(1.04);
+            background: var(--yellow);
+            color: #000;
         }
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-        .status-disponivel {
-            background: #dcfce7;
-            color: #166534;
-        }
-        .status-com-reserva {
-            background: #fef9c3;
-            color: #854d0e;
-        }
-        .status-falta {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-        .status-indisponivel {
-            background: #e2e8f0;
-            color: #475569;
-        }
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-            animation: overlayIn 0.2s ease;
-        }
-        .modal-overlay.active {
-            display: flex;
-        }
-        @keyframes overlayIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        .modal {
-            background: white;
-            border-radius: 24px;
-            max-width: 480px;
-            width: 90%;
-            padding: 32px 28px 28px;
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
-            animation: modalSlide 0.25s ease;
-        }
-        @keyframes modalSlide {
-            from {
-                transform: translateY(30px) scale(0.96);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-        }
-        .modal h2 {
-            font-size: 20px;
-            font-weight: 700;
-            color: #0b1a33;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .modal h2 i {
-            color: #f59e0b;
-        }
-        .modal .sub {
-            font-size: 14px;
-            color: #64748b;
+
+        /* ── FORM ───────────────────────────────── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
             margin-bottom: 20px;
         }
-        .modal .form-group {
-            margin-bottom: 16px;
-        }
-        .modal .form-group label {
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.span2 { grid-column: span 2; }
+
+        label {
+            font-size: 12px;
             font-weight: 600;
-            font-size: 13px;
-            color: #334155;
+            color: var(--text-secondary);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
         }
-        .modal .form-group input {
+        input, select {
+            padding: 10px 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        select option { background: var(--surface2); }
+
+        .btn-submit {
+            background: var(--accent);
+            color: #fff;
+            grid-column: 1 / -1;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .btn-submit:hover { background: var(--accent-hover); box-shadow: 0 0 20px var(--accent-glow); }
+
+        /* ── MODAL OVERLAY ──────────────────────── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.72);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.open { display: flex; }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+            overflow: hidden;
+            animation: modal-in 0.2s ease;
+        }
+        @keyframes modal-in {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .modal-header .modal-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .modal-close {
+            background: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            line-height: 1;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        .modal-close:hover { color: var(--text-primary); background: var(--border); }
+
+        .modal-body { padding: 24px; }
+
+        .modal-info-row {
+            display: flex;
+            justify-content: space-between;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        .modal-info-row .lbl { color: var(--text-muted); font-weight: 500; }
+        .modal-info-row .val { color: var(--text-primary); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+        .modal-field { margin-bottom: 16px; }
+        .modal-field label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .modal-field label .req { color: var(--accent); margin-left: 2px; }
+        .modal-field input {
             width: 100%;
         }
-        .modal .botoes-modal {
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
             display: flex;
-            gap: 12px;
-            margin-top: 24px;
+            gap: 10px;
             justify-content: flex-end;
+            background: var(--surface2);
         }
-        .modal .botoes-modal button {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 12px;
+        .btn-cancel {
+            background: none;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
             font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.15s;
         }
-        .modal .btn-cancelar {
-            background: #e2e8f0;
-            color: #1e293b;
+        .btn-cancel:hover { background: var(--surface); color: var(--text-primary); }
+
+        .btn-confirm {
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
         }
-        .modal .btn-cancelar:hover {
-            background: #cbd5e1;
-        }
-        .modal .btn-confirmar {
-            background: #2563eb;
-            color: white;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-        .modal .btn-confirmar:hover {
-            background: #1d4ed8;
-            transform: scale(1.02);
-        }
-        @media (max-width: 700px) {
-            .container {
-                padding: 16px;
-            }
-            .header h1 {
-                font-size: 20px;
-            }
-            form {
-                grid-template-columns: 1fr 1fr;
-                padding: 16px;
-            }
-            .btn-submit {
-                grid-column: 1 / -1;
-            }
-            .modal {
-                padding: 24px 18px;
-            }
-        }
-        @media (max-width: 480px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-            form {
-                grid-template-columns: 1fr;
-            }
-            .acoes {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+        .btn-confirm:hover { background: var(--accent-hover); box-shadow: 0 0 16px var(--accent-glow); }
+        .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── RESPONSIVE ──────────────────────────── */
+        @media (max-width: 640px) {
+            body { padding: 12px 8px 40px; }
+            .container { border-radius: 12px; }
+            .tab-btn { padding: 14px 14px; font-size: 12px; }
+            .tab-content { padding: 16px; }
+            .form-group.span2 { grid-column: span 1; }
         }
     </style>
 </head>
-
 <body>
+
+    <!-- MODAL DE RESERVA -->
+    <div id="modal-reserva" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <h2>📋 Registrar Reserva</h2>
+                    <div class="modal-sub" id="modal-desc-produto"></div>
+                </div>
+                <button class="modal-close" id="modal-close-btn" title="Fechar">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-info-row">
+                    <span class="lbl">Saldo livre disponível</span>
+                    <span class="val" id="modal-saldo">— m</span>
+                </div>
+                <div class="modal-field">
+                    <label>Nº do Pedido <span class="req">*</span></label>
+                    <input type="text" id="reserva-pedido" placeholder="Ex: PED-2024-001" />
+                </div>
+                <div class="modal-field">
+                    <label>Metros Lineares a Reservar <span class="req">*</span></label>
+                    <input type="number" id="reserva-mts" step="0.01" min="0.01" placeholder="Ex: 5.00" />
+                </div>
+                <div class="modal-field">
+                    <label>Observação <span style="color:var(--text-muted);font-weight:400;">(opcional)</span></label>
+                    <input type="text" id="reserva-obs" placeholder="Informação adicional..." />
+                </div>
+                <div id="modal-erro" class="mensagem erro" style="margin-bottom:0;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="modal-cancel-btn">Cancelar</button>
+                <button class="btn-confirm" id="modal-confirm-btn">✓ Confirmar Reserva</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CABEÇALHO -->
+    <div class="header">
+        <div class="header-eyebrow">Sistema de Gestão</div>
+        <h1>Controle de Corte de<br><span>Filmes e Telas</span></h1>
+        <div class="header-line"></div>
+    </div>
+
     <div class="container">
-
-        <!-- CABEÇALHO -->
-        <div class="header">
-            <h1><i class="fas fa-cut"></i> CONTROLE DE CORTE DE FILMES E TELAS</h1>
-            <span class="badge"><i class="fas fa-database"></i> Supabase</span>
-        </div>
-
-        <!-- ABAS -->
         <div class="tabs">
-            <button id="tab-visualizar-btn" class="tab-btn active"><i class="fas fa-table"></i> Visualizar</button>
-            <button id="tab-inserir-btn" class="tab-btn"><i class="fas fa-plus-circle"></i> Inserir Novo</button>
+            <button id="tab-visualizar-btn" class="tab-btn active">Visualizar / Gerenciar</button>
+            <button id="tab-inserir-btn" class="tab-btn">Inserir Novo Item</button>
         </div>
 
-        <!-- ABA VISUALIZAR -->
+        <!-- ABA: VISUALIZAR -->
         <div id="visualizar" class="tab-content active">
             <div id="mensagem-visualizar" class="mensagem"></div>
             <div class="table-responsive">
@@ -450,446 +489,345 @@
                             <th>Reserva (m)</th>
                             <th>Saldo Livre</th>
                             <th>Status</th>
-                            <th>Pedido</th>
-                            <th>Obs. Reserva</th>
+                            <th>Observação</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="dados-tabela">
-                        <tr><td colspan="14">Carregando...</td></tr>
+                        <tr><td colspan="13">Carregando dados do estoque...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- ABA INSERIR -->
+        <!-- ABA: INSERIR -->
         <div id="inserir" class="tab-content">
             <div id="mensagem-inserir" class="mensagem"></div>
             <form id="produto-form">
-                <div class="form-group">
-                    <label for="descricao_do_produto">Descrição do Produto *</label>
-                    <input type="text" id="descricao_do_produto" required />
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="descricao_do_produto">Descrição do Produto</label>
+                        <input type="text" id="descricao_do_produto" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="caracteristica">Característica</label>
+                        <input type="text" id="caracteristica" />
+                    </div>
+                    <div class="form-group">
+                        <label for="largura_mts">Largura (mts)</label>
+                        <input type="number" id="largura_mts" step="0.01" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="comprim_mts">Comprimento (mts)</label>
+                        <input type="number" id="comprim_mts" step="0.01" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="qtde_rolos_un">Qtd Rolos (un)</label>
+                        <input type="number" id="qtde_rolos_un" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="qtde_m2">Qtd m²</label>
+                        <input type="number" id="qtde_m2" step="0.01" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="mts_lineares">Mts Lineares</label>
+                        <input type="number" id="mts_lineares" step="0.01" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="reserva_mts">Reserva (mts)</label>
+                        <input type="number" id="reserva_mts" step="0.01" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label for="saldo_livre_mts">Saldo Livre</label>
+                        <input type="number" id="saldo_livre_mts" step="0.01" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status">
+                            <option value="Disponível">Disponível</option>
+                            <option value="Indisponível">Indisponível</option>
+                        </select>
+                    </div>
+                    <div class="form-group span2">
+                        <label for="observacao">Observação</label>
+                        <input type="text" id="observacao" />
+                    </div>
+                    <button type="submit" class="btn-submit">Salvar Produto</button>
                 </div>
-                <div class="form-group">
-                    <label for="caracteristica">Característica</label>
-                    <input type="text" id="caracteristica" />
-                </div>
-                <div class="form-group">
-                    <label for="largura_mts">Largura (mts) *</label>
-                    <input type="number" id="largura_mts" step="0.01" required />
-                </div>
-                <div class="form-group">
-                    <label for="comprim_mts">Comprimento (mts) *</label>
-                    <input type="number" id="comprim_mts" step="0.01" required />
-                </div>
-                <div class="form-group">
-                    <label for="qtde_rolos_un">Qtd Rolos (un) *</label>
-                    <input type="number" id="qtde_rolos_un" required />
-                </div>
-                <div class="form-group">
-                    <label for="reserva_mts">Reserva (mts)</label>
-                    <input type="number" id="reserva_mts" step="0.01" value="0" />
-                </div>
-                <div class="form-group">
-                    <label for="status">Status</label>
-                    <select id="status">
-                        <option value="Disponível">Disponível</option>
-                        <option value="COM RESERVA">COM RESERVA</option>
-                        <option value="Indisponível">Indisponível</option>
-                    </select>
-                </div>
-                <div class="form-group" style="grid-column: span 2;">
-                    <label for="observacao">Observação Geral</label>
-                    <input type="text" id="observacao" />
-                </div>
-                <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Salvar Produto</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL RESERVA -->
-    <div id="modal-reserva" class="modal-overlay">
-        <div class="modal">
-            <h2><i class="fas fa-hand-holding-heart"></i> Reservar Material</h2>
-            <div class="sub">Preencha os dados para reservar uma quantidade.</div>
-            <input type="hidden" id="reserva-produto-id" />
-            <div class="form-group">
-                <label for="reserva-pedido">Número do Pedido *</label>
-                <input type="text" id="reserva-pedido" placeholder="Ex: PED-2025-001" required />
-            </div>
-            <div class="form-group">
-                <label for="reserva-obs">Observação (opcional)</label>
-                <input type="text" id="reserva-obs" placeholder="Detalhes da reserva" />
-            </div>
-            <div class="form-group">
-                <label for="reserva-quantidade">Quantidade (metros lineares) *</label>
-                <input type="number" id="reserva-quantidade" step="0.01" min="0.01" placeholder="Ex: 5.00" required />
-            </div>
-            <div class="form-group" style="background: #f1f5f9; border-radius: 10px; padding: 10px 14px;">
-                <span style="font-size:13px; color:#475569;">
-                    <strong>Saldo livre atual:</strong> <span id="reserva-saldo-atual">0</span> m
-                </span>
-            </div>
-            <div class="botoes-modal">
-                <button class="btn-cancelar" id="btn-cancelar-reserva"><i class="fas fa-times"></i> Cancelar</button>
-                <button class="btn-confirmar" id="btn-confirmar-reserva"><i class="fas fa-check"></i> Confirmar Reserva</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        (function() {
-            'use strict';
+    (function () {
+        'use strict';
 
-            // ============================================================
-            // 1. CONFIGURAÇÃO SUPABASE
-            // ============================================================
-            const SUPABASE_URL = 'https://hbchbgymexmlbkyyydqu.supabase.co';
-            const SUPABASE_ANON_KEY = 'sb_publishable_7p2JEkqrYIFG3dhuk_33yA_QMHxSiJt';
-            const NOME_TABELA = 'produtos';
+        // ── CONFIGURAÇÃO SUPABASE ────────────────
+        const SUPABASE_URL      = 'https://hbchbgymexmlbkyyydqu.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_7p2JEkqrYIFG3dhuk_33yA_QMHxSiJt';
+        const NOME_TABELA       = 'produtos';
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-            const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // ── DOM ──────────────────────────────────
+        const tbody          = document.getElementById('dados-tabela');
+        const form           = document.getElementById('produto-form');
+        const tabVisualizar  = document.getElementById('visualizar');
+        const tabInserir     = document.getElementById('inserir');
+        const btnVisualizar  = document.getElementById('tab-visualizar-btn');
+        const btnInserir     = document.getElementById('tab-inserir-btn');
+        const msgVisualizar  = document.getElementById('mensagem-visualizar');
+        const msgInserir     = document.getElementById('mensagem-inserir');
 
-            // ============================================================
-            // 2. ELEMENTOS DOM
-            // ============================================================
-            const tbody = document.getElementById('dados-tabela');
-            const form = document.getElementById('produto-form');
-            const tabVisualizar = document.getElementById('visualizar');
-            const tabInserir = document.getElementById('inserir');
-            const btnVisualizar = document.getElementById('tab-visualizar-btn');
-            const btnInserir = document.getElementById('tab-inserir-btn');
-            const msgVisualizar = document.getElementById('mensagem-visualizar');
-            const msgInserir = document.getElementById('mensagem-inserir');
+        // Modal
+        const modalOverlay   = document.getElementById('modal-reserva');
+        const modalDescProd  = document.getElementById('modal-desc-produto');
+        const modalSaldo     = document.getElementById('modal-saldo');
+        const modalPedido    = document.getElementById('reserva-pedido');
+        const modalMts       = document.getElementById('reserva-mts');
+        const modalObs       = document.getElementById('reserva-obs');
+        const modalErro      = document.getElementById('modal-erro');
+        const btnModalClose  = document.getElementById('modal-close-btn');
+        const btnModalCancel = document.getElementById('modal-cancel-btn');
+        const btnModalConfirm= document.getElementById('modal-confirm-btn');
 
-            const modal = document.getElementById('modal-reserva');
-            const inputProdutoId = document.getElementById('reserva-produto-id');
-            const inputPedido = document.getElementById('reserva-pedido');
-            const inputObs = document.getElementById('reserva-obs');
-            const inputQuantidade = document.getElementById('reserva-quantidade');
-            const spanSaldoAtual = document.getElementById('reserva-saldo-atual');
-            const btnCancelar = document.getElementById('btn-cancelar-reserva');
-            const btnConfirmar = document.getElementById('btn-confirmar-reserva');
+        let reservaItemAtual = null; // armazena o item sendo reservado
 
-            // ============================================================
-            // 3. FUNÇÕES AUXILIARES
-            // ============================================================
-            function exibirMensagem(elemento, texto, tipo) {
-                elemento.textContent = texto;
-                elemento.className = 'mensagem ' + tipo;
-                elemento.style.display = 'block';
-                clearTimeout(elemento._timeout);
-                elemento._timeout = setTimeout(() => {
-                    elemento.style.display = 'none';
-                }, 5000);
-            }
+        // ── MENSAGENS ────────────────────────────
+        function exibirMensagem(el, texto, tipo) {
+            el.textContent = texto;
+            el.className = 'mensagem ' + tipo;
+            el.style.display = 'block';
+            clearTimeout(el._t);
+            el._t = setTimeout(() => { el.style.display = 'none'; }, 5000);
+        }
+        function exibirErro(el, err)    { exibirMensagem(el, '❌ ' + (err.message || err), 'erro'); }
+        function exibirSucesso(el, txt) { exibirMensagem(el, '✅ ' + txt, 'sucesso'); }
 
-            function exibirErro(elemento, erro) {
-                const msg = erro.message || String(erro);
-                exibirMensagem(elemento, '❌ ' + msg, 'erro');
-                console.error('Erro:', erro);
-            }
+        // ── BADGE DE STATUS ──────────────────────
+        function badgeStatus(status) {
+            const s = (status || '').toLowerCase();
+            let cls = 'badge-default';
+            if (s === 'disponível' || s === 'disponivel')    cls = 'badge-disponivel';
+            else if (s === 'com reserva')                    cls = 'badge-reserva';
+            else if (s === 'falta' || s === 'indisponível')  cls = 'badge-falta';
+            return `<span class="badge ${cls}">${escapeHTML(status || '—')}</span>`;
+        }
 
-            function exibirSucesso(elemento, texto) {
-                exibirMensagem(elemento, '✅ ' + texto, 'sucesso');
-            }
-
-            function escapeHTML(str) {
-                if (!str) return '';
-                return str.replace(/[&<>"]/g, function(m) {
-                    if (m === '&') return '&amp;';
-                    if (m === '<') return '&lt;';
-                    if (m === '>') return '&gt;';
-                    if (m === '"') return '&quot;';
-                    return m;
+        // ── CARREGAR DADOS ───────────────────────
+        async function carregarDados() {
+            tbody.innerHTML = '<tr><td colspan="13" style="color:var(--text-muted);padding:20px;">Carregando dados...</td></tr>';
+            msgVisualizar.style.display = 'none';
+            try {
+                const { data, error } = await sb.from(NOME_TABELA).select('*').order('id', { ascending: true });
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="13" style="color:var(--text-muted);padding:20px;">Nenhum produto cadastrado.</td></tr>';
+                    return;
+                }
+                let html = '';
+                data.forEach(item => {
+                    const pedidoInfo = item.pedido
+                        ? `<span style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--yellow);">${escapeHTML(item.pedido)}</span>`
+                        : `<span style="color:var(--text-muted);">—</span>`;
+                    html += `
+                    <tr>
+                        <td class="id-cell">${item.id}</td>
+                        <td class="bold-cell">${escapeHTML(item.descricao_do_produto || '')}</td>
+                        <td style="color:var(--text-secondary);">${escapeHTML(item.caracteristica || '—')}</td>
+                        <td class="num-cell">${item.largura_mts ?? 0}</td>
+                        <td class="num-cell">${item.comprim_mts ?? 0}</td>
+                        <td class="num-cell">${item.qtde_rolos_un ?? 0}</td>
+                        <td class="num-cell">${item.qtde_m2 ?? 0}</td>
+                        <td class="num-cell">${item.mts_lineares ?? 0}</td>
+                        <td class="num-cell" style="color:var(--yellow);">${item.reserva_mts ?? 0}</td>
+                        <td class="num-cell" style="color:var(--green);font-weight:700;">${item.saldo_livre_mts ?? 0}</td>
+                        <td>${badgeStatus(item.status)}</td>
+                        <td style="color:var(--text-secondary);font-size:12px;">${escapeHTML(item.observacao || '—')}</td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn-baixa"  data-id="${item.id}">BAIXA</button>
+                                <button class="btn-reservar" data-id="${item.id}"
+                                    data-desc="${escapeHTML(item.descricao_do_produto || '')}"
+                                    data-saldo="${item.saldo_livre_mts ?? 0}"
+                                    data-reserva="${item.reserva_mts ?? 0}">RESERVAR</button>
+                            </div>
+                        </td>
+                    </tr>`;
                 });
+                tbody.innerHTML = html;
+
+                // Eventos
+                document.querySelectorAll('.btn-baixa').forEach(btn => {
+                    btn.addEventListener('click', () => baixarItem(parseInt(btn.dataset.id, 10)));
+                });
+                document.querySelectorAll('.btn-reservar').forEach(btn => {
+                    btn.addEventListener('click', () => abrirModalReserva({
+                        id:      parseInt(btn.dataset.id, 10),
+                        desc:    btn.dataset.desc,
+                        saldo:   parseFloat(btn.dataset.saldo),
+                        reserva: parseFloat(btn.dataset.reserva)
+                    }));
+                });
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="13" style="color:var(--red);padding:20px;">Erro ao carregar dados: ${escapeHTML(err.message || 'Erro desconhecido')}</td></tr>`;
+                exibirErro(msgVisualizar, err);
+            }
+        }
+
+        // ── BAIXA (excluir) ──────────────────────
+        async function baixarItem(id) {
+            if (!confirm(`Confirmar BAIXA permanente do produto ID ${id}?`)) return;
+            try {
+                const { error } = await sb.from(NOME_TABELA).delete().eq('id', id);
+                if (error) throw error;
+                exibirSucesso(msgVisualizar, `Baixa registrada — Produto ID ${id} removido.`);
+                await carregarDados();
+            } catch (err) {
+                exibirErro(msgVisualizar, err);
+            }
+        }
+
+        // ── MODAL RESERVA ────────────────────────
+        function abrirModalReserva(item) {
+            reservaItemAtual = item;
+            modalDescProd.textContent = item.desc;
+            modalSaldo.textContent    = item.saldo + ' m lineares';
+            modalPedido.value = '';
+            modalMts.value    = '';
+            modalObs.value    = '';
+            modalErro.style.display = 'none';
+            modalMts.max = item.saldo;
+            modalOverlay.classList.add('open');
+            setTimeout(() => modalPedido.focus(), 100);
+        }
+
+        function fecharModal() {
+            modalOverlay.classList.remove('open');
+            reservaItemAtual = null;
+        }
+
+        btnModalClose.addEventListener('click', fecharModal);
+        btnModalCancel.addEventListener('click', fecharModal);
+        modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) fecharModal(); });
+
+        btnModalConfirm.addEventListener('click', async () => {
+            modalErro.style.display = 'none';
+
+            const pedido = modalPedido.value.trim();
+            const mts    = parseFloat(modalMts.value);
+            const obs    = modalObs.value.trim();
+
+            // Validações
+            if (!pedido) {
+                exibirMensagem(modalErro, '❌ O número do pedido é obrigatório.', 'erro');
+                modalErro.style.display = 'block';
+                modalPedido.focus();
+                return;
+            }
+            if (!modalMts.value || isNaN(mts) || mts <= 0) {
+                exibirMensagem(modalErro, '❌ Informe uma quantidade válida de metros lineares.', 'erro');
+                modalErro.style.display = 'block';
+                modalMts.focus();
+                return;
+            }
+            if (mts > reservaItemAtual.saldo) {
+                exibirMensagem(modalErro, `❌ Quantidade (${mts} m) excede o saldo livre (${reservaItemAtual.saldo} m).`, 'erro');
+                modalErro.style.display = 'block';
+                modalMts.focus();
+                return;
             }
 
-            // ============================================================
-            // 4. CARREGAR DADOS (com colunas explícitas)
-            // ============================================================
-            async function carregarDados() {
-                tbody.innerHTML = '<tr><td colspan="14">Carregando dados...</td></tr>';
-                msgVisualizar.style.display = 'none';
+            btnModalConfirm.disabled = true;
+            btnModalConfirm.textContent = 'Salvando…';
 
-                try {
-                    // Lista explícita de colunas (sem pedido e obs_reserva, para evitar erro)
-                    const colunas =
-                        'id, descricao_do_produto, caracteristica, largura_mts, comprim_mts, qtde_rolos_un, qtde_m2, mts_lineares, reserva_mts, saldo_livre_mts, status, observacao';
+            try {
+                const novaReserva  = reservaItemAtual.reserva + mts;
+                const novoSaldo    = parseFloat((reservaItemAtual.saldo - mts).toFixed(4));
 
-                    const { data, error } = await supabase
-                        .from(NOME_TABELA)
-                        .select(colunas)
-                        .order('id', { ascending: true });
+                const { error } = await sb.from(NOME_TABELA).update({
+                    reserva_mts:    novaReserva,
+                    saldo_livre_mts: novoSaldo,
+                    status:         'Com Reserva',
+                    pedido:         pedido,
+                    obs_reserva:    obs || null
+                }).eq('id', reservaItemAtual.id);
 
-                    if (error) throw error;
+                if (error) throw error;
 
-                    if (!data || data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="14">Nenhum produto cadastrado.</td></tr>';
-                        return;
-                    }
-
-                    let html = '';
-                    data.forEach(item => {
-                        let statusClass = 'status-indisponivel';
-                        if (item.status === 'Disponível') statusClass = 'status-disponivel';
-                        else if (item.status === 'COM RESERVA') statusClass = 'status-com-reserva';
-                        else if (item.status === 'Falta') statusClass = 'status-falta';
-
-                        // Campos extras (pedido e obs_reserva) – se existirem, exibimos; senão, vazio
-                        const pedido = item.pedido || '';
-                        const obsReserva = item.obs_reserva || '';
-
-                        html += `
-                            <tr>
-                                <td><b>${item.id}</b></td>
-                                <td>${escapeHTML(item.descricao_do_produto || '')}</td>
-                                <td>${escapeHTML(item.caracteristica || '')}</td>
-                                <td>${item.largura_mts ?? 0}</td>
-                                <td>${item.comprim_mts ?? 0}</td>
-                                <td>${item.qtde_rolos_un ?? 0}</td>
-                                <td>${item.qtde_m2 ?? 0}</td>
-                                <td>${item.mts_lineares ?? 0}</td>
-                                <td>${item.reserva_mts ?? 0}</td>
-                                <td>${item.saldo_livre_mts ?? 0}</td>
-                                <td><span class="status-badge ${statusClass}">${escapeHTML(item.status || '')}</span></td>
-                                <td>${escapeHTML(pedido)}</td>
-                                <td>${escapeHTML(obsReserva)}</td>
-                                <td>
-                                    <div class="acoes">
-                                        <button class="btn-baixa" data-id="${item.id}">
-                                            <i class="fas fa-trash-alt"></i> BAIXA
-                                        </button>
-                                        <button class="btn-reservar" data-id="${item.id}" data-saldo="${item.saldo_livre_mts ?? 0}">
-                                            <i class="fas fa-hand-holding-heart"></i> RESERVAR
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    tbody.innerHTML = html;
-
-                    // Eventos BAIXA
-                    document.querySelectorAll('.btn-baixa').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const id = parseInt(this.dataset.id, 10);
-                            deletarItem(id);
-                        });
-                    });
-
-                    // Eventos RESERVAR
-                    document.querySelectorAll('.btn-reservar').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const id = parseInt(this.dataset.id, 10);
-                            const saldo = parseFloat(this.dataset.saldo) || 0;
-                            abrirModalReserva(id, saldo);
-                        });
-                    });
-
-                } catch (err) {
-                    console.error('Erro ao carregar dados:', err);
-                    tbody.innerHTML =
-                        `<tr><td colspan="14" style="color:red; font-weight:bold;">Erro ao carregar dados: ${escapeHTML(err.message || 'Erro desconhecido')}</td></tr>`;
-                    exibirErro(msgVisualizar, err);
-                }
+                fecharModal();
+                exibirSucesso(msgVisualizar, `Reserva de ${mts} m registrada para o pedido "${pedido}".`);
+                await carregarDados();
+            } catch (err) {
+                exibirMensagem(modalErro, '❌ Erro ao salvar: ' + (err.message || err), 'erro');
+                modalErro.style.display = 'block';
+            } finally {
+                btnModalConfirm.disabled = false;
+                btnModalConfirm.textContent = '✓ Confirmar Reserva';
             }
+        });
 
-            // ============================================================
-            // 5. DELETAR (BAIXA)
-            // ============================================================
-            async function deletarItem(id) {
-                if (!confirm(`Deseja realmente dar BAIXA (excluir) no produto ID ${id}?`)) return;
-
-                try {
-                    const { error } = await supabase
-                        .from(NOME_TABELA)
-                        .delete()
-                        .eq('id', id);
-
-                    if (error) throw error;
-
-                    exibirSucesso(msgVisualizar, `Produto ID ${id} removido com sucesso!`);
-                    await carregarDados();
-                } catch (err) {
-                    console.error('Erro ao excluir:', err);
-                    exibirErro(msgVisualizar, err);
-                }
+        // ── INSERIR ──────────────────────────────
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const novoItem = {
+                descricao_do_produto: document.getElementById('descricao_do_produto').value.trim(),
+                caracteristica:       document.getElementById('caracteristica').value.trim(),
+                largura_mts:          parseFloat(document.getElementById('largura_mts').value),
+                comprim_mts:          parseFloat(document.getElementById('comprim_mts').value),
+                qtde_rolos_un:        parseInt(document.getElementById('qtde_rolos_un').value, 10),
+                qtde_m2:              parseFloat(document.getElementById('qtde_m2').value),
+                mts_lineares:         parseFloat(document.getElementById('mts_lineares').value),
+                reserva_mts:          parseFloat(document.getElementById('reserva_mts').value) || 0,
+                saldo_livre_mts:      parseFloat(document.getElementById('saldo_livre_mts').value),
+                status:               document.getElementById('status').value,
+                observacao:           document.getElementById('observacao').value.trim()
+            };
+            if (!novoItem.descricao_do_produto) {
+                exibirErro(msgInserir, 'A descrição do produto é obrigatória.');
+                return;
             }
-
-            // ============================================================
-            // 6. MODAL RESERVA
-            // ============================================================
-            let produtoIdAtual = null;
-
-            function abrirModalReserva(id, saldoAtual) {
-                produtoIdAtual = id;
-                inputProdutoId.value = id;
-                spanSaldoAtual.textContent = saldoAtual.toFixed(2);
-                inputPedido.value = '';
-                inputObs.value = '';
-                inputQuantidade.value = '';
-                modal.classList.add('active');
-                inputPedido.focus();
+            try {
+                const { error } = await sb.from(NOME_TABELA).insert([novoItem]).select();
+                if (error) throw error;
+                exibirSucesso(msgInserir, 'Produto cadastrado com sucesso!');
+                form.reset();
+                switchTab('visualizar');
+            } catch (err) {
+                exibirErro(msgInserir, err);
             }
+        });
 
-            function fecharModalReserva() {
-                modal.classList.remove('active');
-                produtoIdAtual = null;
-            }
-
-            btnCancelar.addEventListener('click', fecharModalReserva);
-
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) fecharModalReserva();
-            });
-
-            btnConfirmar.addEventListener('click', async function() {
-                const id = parseInt(inputProdutoId.value, 10);
-                const pedido = inputPedido.value.trim();
-                const obs = inputObs.value.trim();
-                const quantidade = parseFloat(inputQuantidade.value);
-
-                if (!pedido) {
-                    alert('O número do pedido é obrigatório.');
-                    inputPedido.focus();
-                    return;
-                }
-                if (!quantidade || quantidade <= 0) {
-                    alert('Informe uma quantidade válida (maior que zero).');
-                    inputQuantidade.focus();
-                    return;
-                }
-
-                const saldoAtual = parseFloat(spanSaldoAtual.textContent) || 0;
-                if (quantidade > saldoAtual) {
-                    alert(`Saldo insuficiente! Disponível: ${saldoAtual.toFixed(2)} m.`);
-                    inputQuantidade.focus();
-                    return;
-                }
-
-                try {
-                    // Busca reserva_mts atual
-                    const { data: [item], error: fetchError } = await supabase
-                        .from(NOME_TABELA)
-                        .select('reserva_mts')
-                        .eq('id', id)
-                        .limit(1);
-
-                    if (fetchError) throw fetchError;
-                    if (!item) throw new Error('Produto não encontrado.');
-
-                    const reservaAtual = item.reserva_mts || 0;
-                    const novaReserva = reservaAtual + quantidade;
-
-                    // Atualiza: reserva_mts, status, pedido, obs_reserva
-                    const { error: updateError } = await supabase
-                        .from(NOME_TABELA)
-                        .update({
-                            reserva_mts: novaReserva,
-                            status: 'COM RESERVA',
-                            pedido: pedido,
-                            obs_reserva: obs || null
-                        })
-                        .eq('id', id);
-
-                    if (updateError) throw updateError;
-
-                    exibirSucesso(msgVisualizar, `Reserva realizada! ${quantidade.toFixed(2)} m reservados.`);
-                    fecharModalReserva();
-                    await carregarDados();
-
-                } catch (err) {
-                    console.error('Erro ao reservar:', err);
-                    alert('Erro ao realizar reserva: ' + (err.message || 'Erro desconhecido.'));
-                }
-            });
-
-            // ============================================================
-            // 7. INSERIR NOVO ITEM
-            // ============================================================
-            form.addEventListener('submit', async function(event) {
-                event.preventDefault();
-
-                const descricao_do_produto = document.getElementById('descricao_do_produto').value.trim();
-                const caracteristica = document.getElementById('caracteristica').value.trim();
-                const largura_mts = parseFloat(document.getElementById('largura_mts').value);
-                const comprim_mts = parseFloat(document.getElementById('comprim_mts').value);
-                const qtde_rolos_un = parseInt(document.getElementById('qtde_rolos_un').value, 10);
-                const reserva_mts = parseFloat(document.getElementById('reserva_mts').value) || 0;
-                const status = document.getElementById('status').value;
-                const observacao = document.getElementById('observacao').value.trim();
-
-                if (!descricao_do_produto) {
-                    exibirErro(msgInserir, 'A descrição do produto é obrigatória.');
-                    return;
-                }
-
-                const novoItem = {
-                    descricao_do_produto,
-                    caracteristica,
-                    largura_mts,
-                    comprim_mts,
-                    qtde_rolos_un,
-                    reserva_mts,
-                    status,
-                    observacao
-                    // qtde_m2, mts_lineares, saldo_livre_mts são gerados pelo banco
-                };
-
-                try {
-                    const { error } = await supabase
-                        .from(NOME_TABELA)
-                        .insert([novoItem]);
-
-                    if (error) throw error;
-
-                    exibirSucesso(msgInserir, 'Produto cadastrado com sucesso!');
-                    form.reset();
-                    document.getElementById('reserva_mts').value = '0';
-                    document.getElementById('status').value = 'Disponível';
-                    switchTab('visualizar');
-                    await carregarDados();
-                } catch (err) {
-                    console.error('Erro ao inserir:', err);
-                    exibirErro(msgInserir, err);
-                }
-            });
-
-            // ============================================================
-            // 8. TROCA DE ABAS
-            // ============================================================
-            function switchTab(tabId) {
-                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-                document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
-                if (tabId === 'visualizar') {
-                    tabVisualizar.classList.add('active');
-                    btnVisualizar.classList.add('active');
-                    carregarDados();
-                } else if (tabId === 'inserir') {
-                    tabInserir.classList.add('active');
-                    btnInserir.classList.add('active');
-                    msgInserir.style.display = 'none';
-                }
-            }
-
-            btnVisualizar.addEventListener('click', () => switchTab('visualizar'));
-            btnInserir.addEventListener('click', () => switchTab('inserir'));
-
-            // ============================================================
-            // 9. INICIALIZAÇÃO
-            // ============================================================
-            window.addEventListener('load', function() {
+        // ── ABAS ─────────────────────────────────
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            if (id === 'visualizar') {
+                tabVisualizar.classList.add('active');
+                btnVisualizar.classList.add('active');
                 carregarDados();
-            });
+            } else {
+                tabInserir.classList.add('active');
+                btnInserir.classList.add('active');
+                msgInserir.style.display = 'none';
+            }
+        }
+        btnVisualizar.addEventListener('click', () => switchTab('visualizar'));
+        btnInserir.addEventListener('click',    () => switchTab('inserir'));
 
-            // Exportar para uso global
-            window.switchTab = switchTab;
-            window.carregarDados = carregarDados;
-            window.deletarItem = deletarItem;
+        // ── INIT ─────────────────────────────────
+        window.addEventListener('load', carregarDados);
 
-        })();
+        // ── ESCAPE HTML ──────────────────────────
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>"]/g, m =>
+                ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m] || m));
+        }
+
+        // Exporta funções globais
+        window.switchTab = switchTab;
+        window.carregarDados = carregarDados;
+    })();
     </script>
 </body>
 </html>
