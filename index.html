@@ -77,7 +77,7 @@
 
         /* ── CONTAINER ──────────────────────────── */
         .container {
-            max-width: 1380px;
+            max-width: 100%;
             margin: 0 auto;
             background: var(--surface);
             border: 1px solid var(--border);
@@ -130,7 +130,7 @@
 
         /* ── TABLE ──────────────────────────────── */
         .table-responsive {
-            overflow-x: hidden;
+            overflow-x: auto;
             border: 1px solid var(--border);
             border-radius: var(--radius);
         }
@@ -138,7 +138,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 12px;
-            table-layout: fixed;
+            table-layout: auto;
         }
         /* Larguras das colunas: ID, Descrição, Caract, Larg, Comp, Rolos, m², MtsLin, Reserva, Saldo, Status, Obs, Ações */
         col.c-id      { width: 42px; }
@@ -150,7 +150,7 @@
         col.c-acoes   { width: 130px; }
 
         thead th {
-            padding: 10px 8px;
+            padding: 11px 10px;
             text-align: left;
             background: var(--surface2);
             color: var(--text-muted);
@@ -160,16 +160,12 @@
             text-transform: uppercase;
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
         tbody td {
-            padding: 10px 8px;
+            padding: 11px 10px;
             border-bottom: 1px solid var(--border);
             color: var(--text-primary);
             vertical-align: middle;
-            overflow: hidden;
-            text-overflow: ellipsis;
             white-space: nowrap;
         }
         tbody tr:last-child td { border-bottom: none; }
@@ -727,10 +723,45 @@
             color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             outline: none;
-            width: 180px;
+            width: 155px;
         }
         .filter-input:focus { border-color: var(--accent); }
         .filter-input::placeholder { color: var(--text-muted); }
+
+        .filter-select {
+            padding: 8px 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            cursor: pointer;
+        }
+        .filter-select:focus { border-color: var(--accent); }
+        .filter-select option { background: var(--surface2); }
+
+        .btn-excel {
+            background: #166534;
+            color: #fff;
+            padding: 9px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border: 1px solid #15803d;
+            white-space: nowrap;
+        }
+        .btn-excel:hover { background: #15803d; box-shadow: 0 0 12px rgba(22,101,52,0.4); }
+
+        .vis-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 14px;
+        }
 
         /* Badges validação */
         .badge-ok {
@@ -986,6 +1017,9 @@
         <!-- ABA: VISUALIZAR -->
         <div id="visualizar" class="tab-content active">
             <div id="mensagem-visualizar" class="mensagem"></div>
+            <div class="vis-toolbar">
+                <button class="btn-excel" id="btn-excel-estoque">⬇ Exportar Excel</button>
+            </div>
             <div class="table-responsive">
                 <table>
                     <colgroup>
@@ -1079,8 +1113,15 @@
             <div class="cortes-toolbar">
                 <div class="cortes-toolbar-left">
                     <button class="btn-add-pv" id="btn-add-pv">+ Adicionar PV</button>
-                    <input type="text" class="filter-input" id="filtro-pedido" placeholder="🔍 Filtrar por pedido..." />
-                    <input type="text" class="filter-input" id="filtro-cliente" placeholder="🔍 Filtrar por cliente..." />
+                    <input type="text" class="filter-input" id="filtro-pedido" placeholder="🔍 Pedido..." />
+                    <input type="text" class="filter-input" id="filtro-cliente" placeholder="🔍 Cliente..." />
+                    <select class="filter-select" id="filtro-status-corte">
+                        <option value="">Todos os status</option>
+                        <option value="NÃO">NÃO</option>
+                        <option value="PARCIAL">PARCIAL</option>
+                        <option value="SIM">SIM</option>
+                    </select>
+                    <button class="btn-excel" id="btn-excel-cortes">⬇ Exportar Excel</button>
                 </div>
             </div>
             <div class="table-responsive">
@@ -1631,14 +1672,91 @@
         function aplicarFiltroCortes() {
             const fp = document.getElementById('filtro-pedido').value.toLowerCase();
             const fc = document.getElementById('filtro-cliente').value.toLowerCase();
+            const fs = document.getElementById('filtro-status-corte').value;
             const filtrado = cortesData.filter(r =>
                 (!fp || (r.pedido  || '').toLowerCase().includes(fp)) &&
-                (!fc || (r.cliente || '').toLowerCase().includes(fc))
+                (!fc || (r.cliente || '').toLowerCase().includes(fc)) &&
+                (!fs || r.status_corte === fs)
             );
             renderCortes(filtrado);
         }
         document.getElementById('filtro-pedido').addEventListener('input', aplicarFiltroCortes);
         document.getElementById('filtro-cliente').addEventListener('input', aplicarFiltroCortes);
+        document.getElementById('filtro-status-corte').addEventListener('change', aplicarFiltroCortes);
+
+        // ── EXPORTAR EXCEL ────────────────────────
+        function exportarExcel(dados, colunas, nomeArquivo) {
+            const header = colunas.map(c => c.label).join('\t');
+            const rows = dados.map(r =>
+                colunas.map(c => {
+                    const v = c.fn ? c.fn(r) : (r[c.key] ?? '');
+                    return String(v).replace(/\t/g, ' ').replace(/\n/g, ' ');
+                }).join('\t')
+            );
+            const tsv = [header, ...rows].join('\n');
+            const blob = new Blob(['\uFEFF' + tsv], { type: 'text/tab-separated-values;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nomeArquivo;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        document.getElementById('btn-excel-estoque').addEventListener('click', async () => {
+            const { data } = await sb.from(NOME_TABELA).select('*').order('id', { ascending: true });
+            if (!data) return;
+            exportarExcel(data, [
+                { label: 'ID',             key: 'id' },
+                { label: 'Descricao',      key: 'descricao_do_produto' },
+                { label: 'Caracteristica', key: 'caracteristica' },
+                { label: 'Largura (m)',    key: 'largura_mts' },
+                { label: 'Compr. (m)',     key: 'comprim_mts' },
+                { label: 'Qtd Rolos',      key: 'qtde_rolos_un' },
+                { label: 'Qtd m2',         key: 'qtde_m2' },
+                { label: 'Mts Lineares',   key: 'mts_lineares' },
+                { label: 'Reserva (m)',    key: 'reserva_mts' },
+                { label: 'Saldo Livre',    key: 'saldo_livre_mts' },
+                { label: 'Status',         key: 'status' },
+                { label: 'Observacao',     key: 'observacao' },
+                { label: 'Pedido',         key: 'pedido' },
+                { label: 'Obs. Reserva',   key: 'obs_reserva' },
+            ], 'estoque_filmes_telas.xls');
+        });
+
+        document.getElementById('btn-excel-cortes').addEventListener('click', () => {
+            const fp = document.getElementById('filtro-pedido').value.toLowerCase();
+            const fc = document.getElementById('filtro-cliente').value.toLowerCase();
+            const fs = document.getElementById('filtro-status-corte').value;
+            const filtrado = cortesData.filter(r =>
+                (!fp || (r.pedido  || '').toLowerCase().includes(fp)) &&
+                (!fc || (r.cliente || '').toLowerCase().includes(fc)) &&
+                (!fs || r.status_corte === fs)
+            );
+            const fmtData = (iso) => {
+                if (!iso) return '';
+                const [y, m, d] = iso.split('T')[0].split('-');
+                return d+'/'+m+'/'+y;
+            };
+            exportarExcel(filtrado, [
+                { label: 'Data',         fn: r => fmtData(r.data || r.criado_em) },
+                { label: 'Pedido',       key: 'pedido' },
+                { label: 'Cliente',      key: 'cliente' },
+                { label: 'Cod. Item',    key: 'cod_item' },
+                { label: 'Item',         key: 'item' },
+                { label: 'Necessidade',  key: 'necessidade' },
+                { label: 'Rolos',        key: 'rolos' },
+                { label: 'Largura',      key: 'largura' },
+                { label: 'Comprimento',  key: 'comprimento' },
+                { label: 'Total',        key: 'total' },
+                { label: 'Validacao',    fn: r => {
+                    const n = parseFloat(r.necessidade)||0, t = parseFloat(r.total)||0;
+                    return (n>0 && Math.abs(n-t)<0.001) ? 'OK' : (n>0 ? 'VERIFICAR' : '-');
+                }},
+                { label: 'Status Corte', key: 'status_corte' },
+                { label: 'Nec. ML (m)',  key: 'necessidade_ml' },
+            ], 'cortes_pedidos.xls');
+        });
 
         // ── MODAL PV ─────────────────────────────
         const modalPv       = document.getElementById('modal-pv');
