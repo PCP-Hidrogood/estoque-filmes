@@ -690,6 +690,119 @@
         tbody tr { cursor: pointer; }
         tbody tr td.actions-cell { cursor: default; }
 
+
+        /* ── ABA CORTES PARA PEDIDOS ─────────────── */
+        .cortes-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .cortes-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-add-pv {
+            background: var(--accent);
+            color: #fff;
+            padding: 9px 18px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .btn-add-pv:hover { background: var(--accent-hover); box-shadow: 0 0 16px var(--accent-glow); }
+
+        .filter-input {
+            padding: 8px 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            width: 180px;
+        }
+        .filter-input:focus { border-color: var(--accent); }
+        .filter-input::placeholder { color: var(--text-muted); }
+
+        /* Badges validação */
+        .badge-ok {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid var(--green-border);
+        }
+        .badge-ok::before { background: var(--green); }
+        .badge-verificar {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid var(--red-border);
+        }
+        .badge-verificar::before { background: var(--red); }
+
+        /* Badges status corte */
+        .badge-sim {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid var(--green-border);
+        }
+        .badge-sim::before { background: var(--green); }
+        .badge-nao {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid var(--red-border);
+        }
+        .badge-nao::before { background: var(--red); }
+        .badge-parcial {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+            border: 1px solid var(--yellow-border);
+        }
+        .badge-parcial::before { background: var(--yellow); }
+
+        /* Select inline na tabela */
+        .select-status-corte {
+            padding: 4px 6px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            cursor: pointer;
+            width: 90px;
+        }
+        .select-status-corte:focus { border-color: var(--accent); }
+
+        .btn-del-corte {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid var(--red-border);
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .btn-del-corte:hover { background: var(--red); color: #fff; }
+
+        /* Modal PV */
+        .modal-pv-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .modal-pv-grid .span2 { grid-column: span 2; }
+
         /* ── RESPONSIVE ──────────────────────────── */
         @media (max-width: 640px) {
             body { padding: 12px 8px 40px; }
@@ -738,6 +851,70 @@
         </div>
     </div>
 
+
+
+    <!-- MODAL ADICIONAR PV -->
+    <div id="modal-pv" class="modal-overlay">
+        <div class="modal" style="max-width:560px;">
+            <div class="modal-header">
+                <div>
+                    <h2>➕ Adicionar PV</h2>
+                    <div class="modal-sub">Preencha os dados do corte para o pedido</div>
+                </div>
+                <button class="modal-close" id="pv-close-btn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-pv-grid">
+                    <div class="modal-field">
+                        <label>Pedido <span class="req">*</span></label>
+                        <input type="text" id="pv-pedido" placeholder="Ex: PV-2024-001" />
+                    </div>
+                    <div class="modal-field">
+                        <label>Cliente</label>
+                        <input type="text" id="pv-cliente" placeholder="Nome do cliente" />
+                    </div>
+                    <div class="modal-field">
+                        <label>Cód. Item</label>
+                        <input type="text" id="pv-cod-item" placeholder="Ex: 001" />
+                    </div>
+                    <div class="modal-field span2">
+                        <label>Item <span class="req">*</span></label>
+                        <input type="text" id="pv-item" placeholder="Descrição do item" />
+                    </div>
+                    <div class="modal-field">
+                        <label>Necessidade (m²)</label>
+                        <input type="number" id="pv-necessidade" step="0.01" min="0" placeholder="0.00" />
+                    </div>
+                    <div class="modal-field">
+                        <label>Rolos <span class="req">*</span></label>
+                        <input type="number" id="pv-rolos" step="1" min="1" placeholder="1" />
+                    </div>
+                    <div class="modal-field">
+                        <label>Largura (m) <span class="req">*</span></label>
+                        <input type="number" id="pv-largura" step="0.01" min="0.01" placeholder="0.00" />
+                    </div>
+                    <div class="modal-field">
+                        <label>Comprimento (m) <span class="req">*</span></label>
+                        <input type="number" id="pv-comprimento" step="0.01" min="0.01" placeholder="0.00" />
+                    </div>
+                </div>
+                <!-- Preview calculado -->
+                <div id="pv-preview" style="display:none;margin-top:14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;">
+                    <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Preview do cálculo</div>
+                    <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                        <div><span style="font-size:11px;color:var(--text-muted);">Total (Rolos × Larg × Comp):</span> <strong id="pv-calc-total" style="color:var(--accent);font-family:JetBrains Mono,monospace;">—</strong></div>
+                        <div><span style="font-size:11px;color:var(--text-muted);">Nec. em Mts Lineares:</span> <strong id="pv-calc-ml" style="color:var(--accent);font-family:JetBrains Mono,monospace;">—</strong></div>
+                        <div><span style="font-size:11px;color:var(--text-muted);">Validação:</span> <strong id="pv-calc-valid" style="font-family:JetBrains Mono,monospace;">—</strong></div>
+                    </div>
+                </div>
+                <div id="pv-erro" class="mensagem erro" style="margin-top:14px;margin-bottom:0;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="pv-cancel-btn">Cancelar</button>
+                <button class="btn-confirm" id="pv-confirm-btn">✓ Salvar</button>
+            </div>
+        </div>
+    </div>
 
     <!-- DRAWER DETALHE DO PRODUTO -->
     <div id="drawer-overlay" class="drawer-overlay"></div>
@@ -803,6 +980,7 @@
         <div class="tabs">
             <button id="tab-visualizar-btn" class="tab-btn active">Visualizar / Gerenciar</button>
             <button id="tab-inserir-btn" class="tab-btn">Inserir Novo Item</button>
+            <button id="tab-cortes-btn" class="tab-btn">Cortes para Pedidos</button>
         </div>
 
         <!-- ABA: VISUALIZAR -->
@@ -894,6 +1072,43 @@
                 </div>
             </form>
         </div>
+
+        <!-- ABA: CORTES PARA PEDIDOS -->
+        <div id="cortes" class="tab-content">
+            <div id="mensagem-cortes" class="mensagem"></div>
+            <div class="cortes-toolbar">
+                <div class="cortes-toolbar-left">
+                    <button class="btn-add-pv" id="btn-add-pv">+ Adicionar PV</button>
+                    <input type="text" class="filter-input" id="filtro-pedido" placeholder="🔍 Filtrar por pedido..." />
+                    <input type="text" class="filter-input" id="filtro-cliente" placeholder="🔍 Filtrar por cliente..." />
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="tabela-cortes" style="font-size:11px;">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Pedido</th>
+                            <th>Cliente</th>
+                            <th>Cód Item</th>
+                            <th>Item</th>
+                            <th>Necessidade</th>
+                            <th>Rolos</th>
+                            <th>Largura</th>
+                            <th>Compr.</th>
+                            <th>Total</th>
+                            <th>Validação</th>
+                            <th>Status Corte</th>
+                            <th>Nec. ML</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-cortes">
+                        <tr><td colspan="14" style="color:var(--text-muted);padding:20px;">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -911,10 +1126,14 @@
         const form           = document.getElementById('produto-form');
         const tabVisualizar  = document.getElementById('visualizar');
         const tabInserir     = document.getElementById('inserir');
+        const tabCortes      = document.getElementById('cortes');
         const btnVisualizar  = document.getElementById('tab-visualizar-btn');
         const btnInserir     = document.getElementById('tab-inserir-btn');
+        const btnTabCortes   = document.getElementById('tab-cortes-btn');
         const msgVisualizar  = document.getElementById('mensagem-visualizar');
         const msgInserir     = document.getElementById('mensagem-inserir');
+        const msgCortes      = document.getElementById('mensagem-cortes');
+        const tbodyCortes    = document.getElementById('tbody-cortes');
 
         // Modal
         const modalOverlay   = document.getElementById('modal-reserva');
@@ -1307,6 +1526,228 @@
             }
         });
 
+        // ── CORTES PARA PEDIDOS ──────────────────
+        let cortesData = [];
+
+        async function carregarCortes() {
+            tbodyCortes.innerHTML = '<tr><td colspan="14" style="color:var(--text-muted);padding:20px;">Carregando...</td></tr>';
+            try {
+                const { data, error } = await sb.from('cortes').select('*').order('criado_em', { ascending: false });
+                if (error) throw error;
+                cortesData = data || [];
+                renderCortes(cortesData);
+            } catch (err) {
+                tbodyCortes.innerHTML = `<tr><td colspan="14" style="color:var(--red);padding:20px;">Erro: ${escapeHTML(err.message)}</td></tr>`;
+            }
+        }
+
+        function renderCortes(lista) {
+            if (!lista || lista.length === 0) {
+                tbodyCortes.innerHTML = '<tr><td colspan="14" style="color:var(--text-muted);padding:20px;">Nenhum registro encontrado.</td></tr>';
+                return;
+            }
+            const fmtData = (iso) => {
+                if (!iso) return '—';
+                const [y, m, d] = iso.split('T')[0].split('-');
+                return `${d}/${m}/${y}`;
+            };
+            const badgeValid = (nec, total) => {
+                const n = parseFloat(nec) || 0;
+                const t = parseFloat(total) || 0;
+                if (n === 0 && t === 0) return '<span class="badge badge-default">—</span>';
+                const ok = Math.abs(n - t) < 0.001;
+                return ok
+                    ? '<span class="badge badge-ok">OK</span>'
+                    : '<span class="badge badge-verificar">VERIFICAR</span>';
+            };
+            const badgeCorte = (s) => {
+                if (s === 'SIM')     return '<span class="badge badge-sim">SIM</span>';
+                if (s === 'PARCIAL') return '<span class="badge badge-parcial">PARCIAL</span>';
+                return '<span class="badge badge-nao">NÃO</span>';
+            };
+
+            let html = '';
+            lista.forEach(r => {
+                html += `<tr>
+                    <td class="num-cell">${fmtData(r.data || r.criado_em)}</td>
+                    <td class="bold-cell" style="color:var(--accent);">${escapeHTML(r.pedido || '—')}</td>
+                    <td>${escapeHTML(r.cliente || '—')}</td>
+                    <td class="num-cell">${escapeHTML(r.cod_item || '—')}</td>
+                    <td>${escapeHTML(r.item || '—')}</td>
+                    <td class="num-cell">${r.necessidade ?? '—'}</td>
+                    <td class="num-cell">${r.rolos ?? '—'}</td>
+                    <td class="num-cell">${r.largura ?? '—'}</td>
+                    <td class="num-cell">${r.comprimento ?? '—'}</td>
+                    <td class="num-cell" style="font-weight:700;">${r.total ?? '—'}</td>
+                    <td>${badgeValid(r.necessidade, r.total)}</td>
+                    <td>
+                        <select class="select-status-corte" data-id="${r.id}">
+                            <option value="NÃO"     ${r.status_corte === 'NÃO'     ? 'selected' : ''}>NÃO</option>
+                            <option value="PARCIAL" ${r.status_corte === 'PARCIAL' ? 'selected' : ''}>PARCIAL</option>
+                            <option value="SIM"     ${r.status_corte === 'SIM'     ? 'selected' : ''}>SIM</option>
+                        </select>
+                    </td>
+                    <td class="num-cell" style="color:var(--yellow);font-weight:700;">${r.necessidade_ml ?? '—'} m</td>
+                    <td>
+                        <button class="btn-del-corte" data-id="${r.id}">🗑</button>
+                    </td>
+                </tr>`;
+            });
+            tbodyCortes.innerHTML = html;
+
+            // Evento: mudar status_corte
+            tbodyCortes.querySelectorAll('.select-status-corte').forEach(sel => {
+                sel.addEventListener('change', async function() {
+                    const id  = parseInt(this.dataset.id, 10);
+                    const val = this.value;
+                    try {
+                        const { error } = await sb.from('cortes').update({ status_corte: val }).eq('id', id);
+                        if (error) throw error;
+                        exibirSucesso(msgCortes, 'Status atualizado!');
+                    } catch (err) {
+                        exibirErro(msgCortes, err);
+                    }
+                });
+            });
+
+            // Evento: deletar corte
+            tbodyCortes.querySelectorAll('.btn-del-corte').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    if (!confirm('Excluir este registro de corte?')) return;
+                    const id = parseInt(this.dataset.id, 10);
+                    try {
+                        const { error } = await sb.from('cortes').delete().eq('id', id);
+                        if (error) throw error;
+                        exibirSucesso(msgCortes, 'Registro removido.');
+                        await carregarCortes();
+                    } catch (err) {
+                        exibirErro(msgCortes, err);
+                    }
+                });
+            });
+        }
+
+        // Filtros em tempo real
+        function aplicarFiltroCortes() {
+            const fp = document.getElementById('filtro-pedido').value.toLowerCase();
+            const fc = document.getElementById('filtro-cliente').value.toLowerCase();
+            const filtrado = cortesData.filter(r =>
+                (!fp || (r.pedido  || '').toLowerCase().includes(fp)) &&
+                (!fc || (r.cliente || '').toLowerCase().includes(fc))
+            );
+            renderCortes(filtrado);
+        }
+        document.getElementById('filtro-pedido').addEventListener('input', aplicarFiltroCortes);
+        document.getElementById('filtro-cliente').addEventListener('input', aplicarFiltroCortes);
+
+        // ── MODAL PV ─────────────────────────────
+        const modalPv       = document.getElementById('modal-pv');
+        const pvErro        = document.getElementById('pv-erro');
+        const pvConfirmBtn  = document.getElementById('pv-confirm-btn');
+
+        function abrirModalPv() {
+            ['pv-pedido','pv-cliente','pv-cod-item','pv-item','pv-necessidade','pv-rolos','pv-largura','pv-comprimento']
+                .forEach(id => { document.getElementById(id).value = ''; });
+            pvErro.style.display = 'none';
+            document.getElementById('pv-preview').style.display = 'none';
+            modalPv.classList.add('open');
+            setTimeout(() => document.getElementById('pv-pedido').focus(), 100);
+        }
+        function fecharModalPv() { modalPv.classList.remove('open'); }
+
+        document.getElementById('btn-add-pv').addEventListener('click', abrirModalPv);
+        document.getElementById('pv-close-btn').addEventListener('click', fecharModalPv);
+        document.getElementById('pv-cancel-btn').addEventListener('click', fecharModalPv);
+        modalPv.addEventListener('click', e => { if (e.target === modalPv) fecharModalPv(); });
+
+        // Preview ao digitar
+        ['pv-rolos','pv-largura','pv-comprimento','pv-necessidade'].forEach(id => {
+            document.getElementById(id).addEventListener('input', atualizarPreviewPv);
+        });
+        function atualizarPreviewPv() {
+            const rolos  = parseFloat(document.getElementById('pv-rolos').value) || 0;
+            const larg   = parseFloat(document.getElementById('pv-largura').value) || 0;
+            const comp   = parseFloat(document.getElementById('pv-comprimento').value) || 0;
+            const nec    = parseFloat(document.getElementById('pv-necessidade').value) || 0;
+            if (!rolos && !larg && !comp) {
+                document.getElementById('pv-preview').style.display = 'none';
+                return;
+            }
+            const total = rolos * larg * comp;
+            const ml    = rolos * comp;
+            const ok    = nec > 0 && Math.abs(nec - total) < 0.001;
+            const validHtml = nec > 0
+                ? (ok ? '<span style="color:var(--green);">OK</span>' : '<span style="color:var(--red);">VERIFICAR</span>')
+                : '<span style="color:var(--text-muted);">—</span>';
+            document.getElementById('pv-calc-total').textContent = total.toFixed(2) + ' m²';
+            document.getElementById('pv-calc-ml').textContent    = ml.toFixed(2) + ' m';
+            document.getElementById('pv-calc-valid').innerHTML   = validHtml;
+            document.getElementById('pv-preview').style.display = 'block';
+        }
+
+        pvConfirmBtn.addEventListener('click', async () => {
+            pvErro.style.display = 'none';
+            const pedido      = document.getElementById('pv-pedido').value.trim();
+            const cliente     = document.getElementById('pv-cliente').value.trim();
+            const cod_item    = document.getElementById('pv-cod-item').value.trim();
+            const item        = document.getElementById('pv-item').value.trim();
+            const necessidade = parseFloat(document.getElementById('pv-necessidade').value) || null;
+            const rolos       = parseInt(document.getElementById('pv-rolos').value, 10);
+            const largura     = parseFloat(document.getElementById('pv-largura').value);
+            const comprimento = parseFloat(document.getElementById('pv-comprimento').value);
+
+            if (!pedido) {
+                exibirMensagem(pvErro, '❌ O campo Pedido é obrigatório.', 'erro');
+                pvErro.style.display = 'block';
+                document.getElementById('pv-pedido').focus();
+                return;
+            }
+            if (!item) {
+                exibirMensagem(pvErro, '❌ O campo Item é obrigatório.', 'erro');
+                pvErro.style.display = 'block';
+                document.getElementById('pv-item').focus();
+                return;
+            }
+            if (!rolos || rolos < 1) {
+                exibirMensagem(pvErro, '❌ Informe a quantidade de rolos.', 'erro');
+                pvErro.style.display = 'block';
+                document.getElementById('pv-rolos').focus();
+                return;
+            }
+            if (!largura || largura <= 0) {
+                exibirMensagem(pvErro, '❌ Informe a largura.', 'erro');
+                pvErro.style.display = 'block';
+                document.getElementById('pv-largura').focus();
+                return;
+            }
+            if (!comprimento || comprimento <= 0) {
+                exibirMensagem(pvErro, '❌ Informe o comprimento.', 'erro');
+                pvErro.style.display = 'block';
+                document.getElementById('pv-comprimento').focus();
+                return;
+            }
+
+            pvConfirmBtn.disabled = true;
+            pvConfirmBtn.textContent = 'Salvando…';
+            try {
+                const { error } = await sb.from('cortes').insert([{
+                    pedido, cliente, cod_item, item,
+                    necessidade, rolos, largura, comprimento,
+                    status_corte: 'NÃO'
+                }]);
+                if (error) throw error;
+                fecharModalPv();
+                exibirSucesso(msgCortes, `PV "${pedido}" adicionado com sucesso!`);
+                await carregarCortes();
+            } catch (err) {
+                exibirMensagem(pvErro, '❌ Erro ao salvar: ' + (err.message || err), 'erro');
+                pvErro.style.display = 'block';
+            } finally {
+                pvConfirmBtn.disabled = false;
+                pvConfirmBtn.textContent = '✓ Salvar';
+            }
+        });
+
         // ── ABAS ─────────────────────────────────
         function switchTab(id) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -1315,6 +1756,10 @@
                 tabVisualizar.classList.add('active');
                 btnVisualizar.classList.add('active');
                 carregarDados();
+            } else if (id === 'cortes') {
+                tabCortes.classList.add('active');
+                btnTabCortes.classList.add('active');
+                carregarCortes();
             } else {
                 tabInserir.classList.add('active');
                 btnInserir.classList.add('active');
@@ -1323,6 +1768,7 @@
         }
         btnVisualizar.addEventListener('click', () => switchTab('visualizar'));
         btnInserir.addEventListener('click',    () => switchTab('inserir'));
+        btnTabCortes.addEventListener('click',  () => switchTab('cortes'));
 
         // ── INIT ─────────────────────────────────
         window.addEventListener('load', carregarDados);
