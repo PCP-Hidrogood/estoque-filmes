@@ -1134,6 +1134,152 @@
         }
         .btn-del-corte:hover { background: var(--red); color: #fff; }
 
+        .btn-etiqueta {
+            background: rgba(168,85,247,0.12);
+            color: #c084fc;
+            border: 1px solid rgba(168,85,247,0.3);
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .btn-etiqueta:hover { background: #a855f7; color: #fff; }
+
+        /* ── MODAL ETIQUETA ── */
+        .etiqueta-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .etiqueta-nav button {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .etiqueta-nav button:hover { background: var(--border); }
+        .etiqueta-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .etiqueta-nav .nav-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            min-width: 80px;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* A etiqueta em si */
+        .etiqueta-preview {
+            border: 2px solid #000;
+            border-radius: 0;
+            background: #fff;
+            color: #000;
+            padding: 18px 24px 14px;
+            max-width: 480px;
+            margin: 0 auto;
+            font-family: Arial, sans-serif;
+        }
+        .etiqueta-empresa {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-bottom: 1.5px solid #000;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+        .etiqueta-cliente-lbl {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #c00;
+            margin-bottom: 2px;
+        }
+        .etiqueta-cliente-nome {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            margin-bottom: 6px;
+            line-height: 1.1;
+        }
+        .etiqueta-descricao {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .etiqueta-dimensoes {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 0.02em;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+        .etiqueta-rodape {
+            display: flex;
+            border-top: 1.5px solid #000;
+            margin-top: 8px;
+        }
+        .etiqueta-rodape-item {
+            flex: 1;
+            padding: 8px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-align: center;
+        }
+        .etiqueta-rodape-item:first-child {
+            border-right: 1.5px solid #000;
+        }
+
+        /* Modo edição da etiqueta */
+        .etiqueta-edit-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .etiqueta-edit-grid .span2 { grid-column: span 2; }
+        .etiqueta-edit-field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        .etiqueta-edit-field input {
+            width: 100%;
+        }
+
+        /* Print etiqueta */
+        @media print {
+            .etiqueta-preview {
+                border: 2px solid #000 !important;
+                color: #000 !important;
+                background: #fff !important;
+                page-break-inside: avoid;
+            }
+            .etiqueta-empresa, .etiqueta-cliente-nome, .etiqueta-descricao,
+            .etiqueta-dimensoes, .etiqueta-rodape-item { color: #000 !important; }
+            .etiqueta-cliente-lbl { color: #c00 !important; }
+        }
+
         /* Modal PV */
         .modal-pv-grid {
             display: grid;
@@ -1256,6 +1402,74 @@
     </div>
 
 
+
+
+    <!-- MODAL ETIQUETA -->
+    <div id="modal-etiqueta" class="modal-overlay">
+        <div class="modal" style="max-width:600px;">
+            <div class="modal-header">
+                <div>
+                    <h2>🏷️ Etiquetas do Pedido</h2>
+                    <div class="modal-sub" id="etiqueta-modal-sub"></div>
+                </div>
+                <button class="modal-close" id="etiqueta-close-btn">✕</button>
+            </div>
+            <div class="modal-body" id="etiqueta-modal-body">
+
+                <!-- MODO VISUALIZAÇÃO -->
+                <div id="etiqueta-view-mode">
+                    <div class="etiqueta-nav">
+                        <button id="etiqueta-prev">◀</button>
+                        <span class="nav-label" id="etiqueta-nav-label">1 / 1</span>
+                        <button id="etiqueta-next">▶</button>
+                    </div>
+                    <div id="etiqueta-container"></div>
+                </div>
+
+                <!-- MODO EDIÇÃO -->
+                <div id="etiqueta-edit-mode" style="display:none;">
+                    <div class="etiqueta-edit-grid">
+                        <div class="etiqueta-edit-field span2">
+                            <label>Empresa</label>
+                            <input type="text" id="edit-empresa" />
+                        </div>
+                        <div class="etiqueta-edit-field span2">
+                            <label>Cliente</label>
+                            <input type="text" id="edit-cliente" />
+                        </div>
+                        <div class="etiqueta-edit-field span2">
+                            <label>Descrição do Item</label>
+                            <input type="text" id="edit-descricao" />
+                        </div>
+                        <div class="etiqueta-edit-field">
+                            <label>Largura (m)</label>
+                            <input type="number" id="edit-largura" step="0.01" />
+                        </div>
+                        <div class="etiqueta-edit-field">
+                            <label>Comprimento (m)</label>
+                            <input type="number" id="edit-comprimento" step="0.01" />
+                        </div>
+                        <div class="etiqueta-edit-field">
+                            <label>Quantidade de Rolos</label>
+                            <input type="number" id="edit-rolos" step="1" min="1" />
+                        </div>
+                        <div class="etiqueta-edit-field">
+                            <label>Pedido</label>
+                            <input type="text" id="edit-pedido" />
+                        </div>
+                    </div>
+                    <div style="text-align:center;margin-top:8px;">
+                        <button class="btn-confirm" id="etiqueta-aplicar-btn" style="padding:10px 24px;font-size:13px;">✓ Aplicar Alterações</button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="etiqueta-edit-toggle-btn">✏️ Editar</button>
+                <button class="btn-confirm" id="etiqueta-print-btn" style="background:#166534;border:1px solid #15803d;">🖨️ Imprimir</button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL AJUSTE DE METROS -->
     <div id="modal-ajuste" class="modal-overlay">
@@ -1594,11 +1808,12 @@
                             <th>Validação</th>
                             <th>Status Corte</th>
                             <th>Nec. ML</th>
-                            <th>Ação</th>
+                            <th>Etiqueta</th>
+                            <th>Excluir</th>
                         </tr>
                     </thead>
                     <tbody id="tbody-cortes">
-                        <tr><td colspan="14" style="color:var(--text-muted);padding:20px;">Carregando...</td></tr>
+                        <tr><td colspan="15" style="color:var(--text-muted);padding:20px;">Carregando...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -2218,20 +2433,20 @@
         let cortesData = [];
 
         async function carregarCortes() {
-            tbodyCortes.innerHTML = '<tr><td colspan="14" style="color:var(--text-muted);padding:20px;">Carregando...</td></tr>';
+            tbodyCortes.innerHTML = '<tr><td colspan="15" style="color:var(--text-muted);padding:20px;">Carregando...</td></tr>';
             try {
                 const { data, error } = await sb.from('cortes').select('*').order('criado_em', { ascending: false });
                 if (error) throw error;
                 cortesData = data || [];
                 renderCortes(cortesData);
             } catch (err) {
-                tbodyCortes.innerHTML = `<tr><td colspan="14" style="color:var(--red);padding:20px;">Erro: ${escapeHTML(err.message)}</td></tr>`;
+                tbodyCortes.innerHTML = `<tr><td colspan="15" style="color:var(--red);padding:20px;">Erro: ${escapeHTML(err.message)}</td></tr>`;
             }
         }
 
         function renderCortes(lista) {
             if (!lista || lista.length === 0) {
-                tbodyCortes.innerHTML = '<tr><td colspan="14" style="color:var(--text-muted);padding:20px;">Nenhum registro encontrado.</td></tr>';
+                tbodyCortes.innerHTML = '<tr><td colspan="15" style="color:var(--text-muted);padding:20px;">Nenhum registro encontrado.</td></tr>';
                 return;
             }
             const fmtData = (iso) => {
@@ -2277,6 +2492,16 @@
                     </td>
                     <td class="num-cell" style="color:var(--yellow);font-weight:700;">${r.necessidade_ml ?? '—'} m</td>
                     <td>
+                        <button class="btn-etiqueta"
+                            data-id="${r.id}"
+                            data-pedido="${escapeHTML(r.pedido||'')}"
+                            data-cliente="${escapeHTML(r.cliente||'')}"
+                            data-item="${escapeHTML(r.item||'')}"
+                            data-largura="${r.largura??0}"
+                            data-comprimento="${r.comprimento??0}"
+                            data-rolos="${r.rolos??1}">🏷️ Etiqueta</button>
+                    </td>
+                    <td>
                         <button class="btn-del-corte" data-id="${r.id}">🗑</button>
                     </td>
                 </tr>`;
@@ -2313,7 +2538,173 @@
                     }
                 });
             });
+
+            // Evento: abrir etiqueta
+            tbodyCortes.querySelectorAll('.btn-etiqueta').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    abrirModalEtiqueta({
+                        pedido:      this.dataset.pedido,
+                        cliente:     this.dataset.cliente,
+                        item:        this.dataset.item,
+                        largura:     parseFloat(this.dataset.largura),
+                        comprimento: parseFloat(this.dataset.comprimento),
+                        rolos:       parseInt(this.dataset.rolos, 10) || 1
+                    });
+                });
+            });
         }
+
+
+        // ── MODAL ETIQUETA ───────────────────────
+        const EMPRESA_NOME = 'HIDROGOOD HORTICULTURA MODERNA LTDA';
+        let etiquetaDados  = null;
+        let etiquetaIdx    = 0; // rolo atual (0-based)
+        let etiquetaModoEdicao = false;
+
+        function gerarHTMLEtiqueta(d, roloAtual, totalRolos) {
+            return `
+            <div class="etiqueta-preview" id="etiqueta-print-area">
+                <div class="etiqueta-empresa">${escapeHTML(d.empresa)}</div>
+                <div class="etiqueta-cliente-lbl">Cliente</div>
+                <div class="etiqueta-cliente-nome">${escapeHTML(d.cliente)}</div>
+                <div class="etiqueta-descricao">${escapeHTML(d.item)} - ${d.largura} X ${d.comprimento}</div>
+                <div class="etiqueta-dimensoes">${d.largura} X ${d.comprimento} M</div>
+                <div class="etiqueta-rodape">
+                    <div class="etiqueta-rodape-item">QUANTIDADE ${roloAtual}/${totalRolos}</div>
+                    <div class="etiqueta-rodape-item">PEDIDO ${escapeHTML(d.pedido)}</div>
+                </div>
+            </div>`;
+        }
+
+        function atualizarEtiquetaView() {
+            const total = etiquetaDados.rolos;
+            const rolo  = etiquetaIdx + 1;
+            document.getElementById('etiqueta-nav-label').textContent = `${rolo} / ${total}`;
+            document.getElementById('etiqueta-prev').disabled = etiquetaIdx === 0;
+            document.getElementById('etiqueta-next').disabled = etiquetaIdx === total - 1;
+            document.getElementById('etiqueta-container').innerHTML =
+                gerarHTMLEtiqueta(etiquetaDados, rolo, total);
+        }
+
+        function abrirModalEtiqueta(dados) {
+            etiquetaDados = {
+                empresa:     EMPRESA_NOME,
+                cliente:     dados.cliente || '—',
+                item:        dados.item    || '—',
+                largura:     dados.largura || 0,
+                comprimento: dados.comprimento || 0,
+                rolos:       dados.rolos || 1,
+                pedido:      dados.pedido || '—'
+            };
+            etiquetaIdx  = 0;
+            etiquetaModoEdicao = false;
+
+            // Subheader
+            document.getElementById('etiqueta-modal-sub').textContent =
+                `${etiquetaDados.rolos} rolo(s) · Pedido: ${etiquetaDados.pedido}`;
+
+            // Reseta modos
+            document.getElementById('etiqueta-view-mode').style.display = 'block';
+            document.getElementById('etiqueta-edit-mode').style.display = 'none';
+            document.getElementById('etiqueta-edit-toggle-btn').textContent = '✏️ Editar';
+
+            atualizarEtiquetaView();
+            document.getElementById('modal-etiqueta').classList.add('open');
+        }
+
+        function fecharModalEtiqueta() {
+            document.getElementById('modal-etiqueta').classList.remove('open');
+            etiquetaDados = null;
+        }
+
+        document.getElementById('etiqueta-close-btn').addEventListener('click', fecharModalEtiqueta);
+        document.getElementById('modal-etiqueta').addEventListener('click', e => {
+            if (e.target === document.getElementById('modal-etiqueta')) fecharModalEtiqueta();
+        });
+
+        document.getElementById('etiqueta-prev').addEventListener('click', () => {
+            if (etiquetaIdx > 0) { etiquetaIdx--; atualizarEtiquetaView(); }
+        });
+        document.getElementById('etiqueta-next').addEventListener('click', () => {
+            if (etiquetaIdx < etiquetaDados.rolos - 1) { etiquetaIdx++; atualizarEtiquetaView(); }
+        });
+
+        // Alternar edição / visualização
+        document.getElementById('etiqueta-edit-toggle-btn').addEventListener('click', () => {
+            etiquetaModoEdicao = !etiquetaModoEdicao;
+            if (etiquetaModoEdicao) {
+                // Preenche campos com dados atuais
+                document.getElementById('edit-empresa').value     = etiquetaDados.empresa;
+                document.getElementById('edit-cliente').value     = etiquetaDados.cliente;
+                document.getElementById('edit-descricao').value   = etiquetaDados.item;
+                document.getElementById('edit-largura').value     = etiquetaDados.largura;
+                document.getElementById('edit-comprimento').value = etiquetaDados.comprimento;
+                document.getElementById('edit-rolos').value       = etiquetaDados.rolos;
+                document.getElementById('edit-pedido').value      = etiquetaDados.pedido;
+                document.getElementById('etiqueta-view-mode').style.display = 'none';
+                document.getElementById('etiqueta-edit-mode').style.display = 'block';
+                document.getElementById('etiqueta-edit-toggle-btn').textContent = '👁 Visualizar';
+            } else {
+                document.getElementById('etiqueta-view-mode').style.display = 'block';
+                document.getElementById('etiqueta-edit-mode').style.display = 'none';
+                document.getElementById('etiqueta-edit-toggle-btn').textContent = '✏️ Editar';
+                atualizarEtiquetaView();
+            }
+        });
+
+        // Aplicar edição
+        document.getElementById('etiqueta-aplicar-btn').addEventListener('click', () => {
+            const novosRolos = parseInt(document.getElementById('edit-rolos').value, 10) || 1;
+            etiquetaDados.empresa     = document.getElementById('edit-empresa').value.trim()     || etiquetaDados.empresa;
+            etiquetaDados.cliente     = document.getElementById('edit-cliente').value.trim()     || etiquetaDados.cliente;
+            etiquetaDados.item        = document.getElementById('edit-descricao').value.trim()   || etiquetaDados.item;
+            etiquetaDados.largura     = parseFloat(document.getElementById('edit-largura').value)     || etiquetaDados.largura;
+            etiquetaDados.comprimento = parseFloat(document.getElementById('edit-comprimento').value) || etiquetaDados.comprimento;
+            etiquetaDados.rolos       = novosRolos;
+            etiquetaDados.pedido      = document.getElementById('edit-pedido').value.trim()      || etiquetaDados.pedido;
+            // Ajusta índice se necessário
+            if (etiquetaIdx >= novosRolos) etiquetaIdx = novosRolos - 1;
+            // Volta para visualização
+            etiquetaModoEdicao = false;
+            document.getElementById('etiqueta-view-mode').style.display = 'block';
+            document.getElementById('etiqueta-edit-mode').style.display = 'none';
+            document.getElementById('etiqueta-edit-toggle-btn').textContent = '✏️ Editar';
+            document.getElementById('etiqueta-modal-sub').textContent =
+                `${etiquetaDados.rolos} rolo(s) · Pedido: ${etiquetaDados.pedido}`;
+            atualizarEtiquetaView();
+        });
+
+        // Imprimir — gera todas as etiquetas e abre janela de impressão
+        document.getElementById('etiqueta-print-btn').addEventListener('click', () => {
+            const total = etiquetaDados.rolos;
+            let allEtiquetas = '';
+            for (let i = 1; i <= total; i++) {
+                allEtiquetas += `
+                <div style="page-break-inside:avoid; margin-bottom:24px;">
+                    ${gerarHTMLEtiqueta(etiquetaDados, i, total)}
+                </div>`;
+            }
+            const win = window.open('', '_blank');
+            win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+            <title>Etiquetas - ${escapeHTML(etiquetaDados.pedido)}</title>
+            <style>
+                * { box-sizing: border-box; margin: 0; padding: 0; }
+                body { font-family: Arial, sans-serif; background: #fff; padding: 20px; }
+                .etiqueta-preview { border: 2px solid #000; padding: 18px 24px 14px; max-width: 480px; margin: 0 auto; }
+                .etiqueta-empresa { text-align:center; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; border-bottom:1.5px solid #000; padding-bottom:8px; margin-bottom:10px; }
+                .etiqueta-cliente-lbl { text-align:center; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#c00; margin-bottom:2px; }
+                .etiqueta-cliente-nome { text-align:center; font-size:22px; font-weight:900; text-transform:uppercase; margin-bottom:6px; line-height:1.1; }
+                .etiqueta-descricao { text-align:center; font-size:12px; font-weight:700; text-transform:uppercase; margin-bottom:6px; }
+                .etiqueta-dimensoes { text-align:center; font-size:28px; font-weight:900; margin-bottom:10px; line-height:1; }
+                .etiqueta-rodape { display:flex; border-top:1.5px solid #000; margin-top:8px; }
+                .etiqueta-rodape-item { flex:1; padding:8px 10px; font-size:11px; font-weight:700; text-transform:uppercase; text-align:center; }
+                .etiqueta-rodape-item:first-child { border-right:1.5px solid #000; }
+                @media print { body { padding: 0; } }
+            </style></head><body>${allEtiquetas}
+            <script>window.onload=function(){window.print();}<\/script>
+            </body></html>`);
+            win.document.close();
+        });
 
         // Filtros em tempo real
         function aplicarFiltroCortes() {
