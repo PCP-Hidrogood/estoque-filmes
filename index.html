@@ -1288,6 +1288,70 @@
         }
         .modal-pv-grid .span2 { grid-column: span 2; }
 
+        /* ── MODAL SENHA ADMIN ───────────────────── */
+        .modal-senha {
+            max-width: 380px;
+        }
+        .senha-icon {
+            text-align: center;
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+        .senha-desc {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .senha-desc strong {
+            color: var(--text-primary);
+            display: block;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .senha-input-wrap {
+            position: relative;
+        }
+        .senha-input-wrap input {
+            width: 100%;
+            padding-right: 40px;
+            letter-spacing: 0.2em;
+            font-size: 18px;
+            text-align: center;
+        }
+        .senha-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            color: var(--text-muted);
+            font-size: 16px;
+            padding: 4px;
+            line-height: 1;
+        }
+        .senha-toggle:hover { color: var(--text-primary); }
+        .senha-tentativas {
+            text-align: center;
+            font-size: 11px;
+            color: var(--red);
+            margin-top: 8px;
+            min-height: 16px;
+            font-weight: 600;
+        }
+        .senha-lembrar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 14px;
+            cursor: pointer;
+            justify-content: center;
+        }
+        .senha-lembrar input[type=checkbox] { cursor: pointer; width: auto; }
+
         /* ── RESPONSIVE ──────────────────────────── */
         @media (max-width: 640px) {
             body { padding: 12px 8px 40px; }
@@ -1299,6 +1363,40 @@
     </style>
 </head>
 <body>
+
+
+    <!-- MODAL SENHA ADMIN -->
+    <div id="modal-senha" class="modal-overlay">
+        <div class="modal modal-senha">
+            <div class="modal-header">
+                <div>
+                    <h2>🔐 Acesso Restrito</h2>
+                    <div class="modal-sub">Confirmação de administrador</div>
+                </div>
+                <button class="modal-close" id="senha-close-btn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="senha-icon">🛡️</div>
+                <div class="senha-desc">
+                    <strong id="senha-acao-label">Ação protegida</strong>
+                    Esta ação requer autorização de administrador.
+                </div>
+                <div class="senha-input-wrap">
+                    <input type="password" id="senha-input" placeholder="••••••••" autocomplete="off" />
+                    <button class="senha-toggle" id="senha-toggle-vis" title="Mostrar/ocultar">👁</button>
+                </div>
+                <div class="senha-tentativas" id="senha-tentativas"></div>
+                <label class="senha-lembrar">
+                    <input type="checkbox" id="senha-lembrar-check" />
+                    Lembrar por 30 minutos
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="senha-cancel-btn">Cancelar</button>
+                <button class="btn-confirm" id="senha-confirm-btn">✓ Confirmar</button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL DE RESERVA -->
     <div id="modal-reserva" class="modal-overlay">
@@ -1845,6 +1943,90 @@
         const NOME_TABELA       = 'produtos';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // ── SENHA ADMIN ──────────────────────────
+        const ADMIN_SENHA = 'hidro@2025'; // ← altere aqui a senha
+        const SENHA_SESSAO_KEY = 'admin_auth_exp';
+
+        function adminAutenticado() {
+            const exp = parseInt(sessionStorage.getItem(SENHA_SESSAO_KEY) || '0', 10);
+            return Date.now() < exp;
+        }
+
+        function marcarSessaoAdmin(lembrar) {
+            const duracao = lembrar ? 30 * 60 * 1000 : 5 * 60 * 1000; // 30min ou 5min
+            sessionStorage.setItem(SENHA_SESSAO_KEY, String(Date.now() + duracao));
+        }
+
+        let _senhaCallback  = null;
+        let _senhaTentativas = 0;
+
+        /**
+         * pedirSenha(label, callback)
+         * Exibe o modal de senha. Se já autenticado na sessão, executa callback direto.
+         * callback é chamado sem argumentos quando senha correta.
+         */
+        function pedirSenha(label, callback) {
+            if (adminAutenticado()) { callback(); return; }
+
+            _senhaCallback   = callback;
+            _senhaTentativas = 0;
+
+            document.getElementById('senha-acao-label').textContent = label;
+            document.getElementById('senha-input').value = '';
+            document.getElementById('senha-tentativas').textContent = '';
+            document.getElementById('senha-lembrar-check').checked = false;
+            document.getElementById('senha-input').type = 'password';
+            document.getElementById('modal-senha').classList.add('open');
+            setTimeout(() => document.getElementById('senha-input').focus(), 120);
+        }
+
+        function fecharModalSenha() {
+            document.getElementById('modal-senha').classList.remove('open');
+            _senhaCallback = null;
+        }
+
+        document.getElementById('senha-close-btn').addEventListener('click', fecharModalSenha);
+        document.getElementById('senha-cancel-btn').addEventListener('click', fecharModalSenha);
+        document.getElementById('modal-senha').addEventListener('click', e => {
+            if (e.target === document.getElementById('modal-senha')) fecharModalSenha();
+        });
+
+        // Mostrar/ocultar senha
+        document.getElementById('senha-toggle-vis').addEventListener('click', () => {
+            const inp = document.getElementById('senha-input');
+            inp.type = inp.type === 'password' ? 'text' : 'password';
+        });
+
+        // Enter confirma
+        document.getElementById('senha-input').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('senha-confirm-btn').click();
+        });
+
+        document.getElementById('senha-confirm-btn').addEventListener('click', () => {
+            const digitada = document.getElementById('senha-input').value;
+            if (digitada === ADMIN_SENHA) {
+                const lembrar = document.getElementById('senha-lembrar-check').checked;
+                marcarSessaoAdmin(lembrar);
+                fecharModalSenha();
+                if (_senhaCallback) _senhaCallback();
+            } else {
+                _senhaTentativas++;
+                document.getElementById('senha-input').value = '';
+                document.getElementById('senha-input').focus();
+                const tentEl = document.getElementById('senha-tentativas');
+                tentEl.textContent = `Senha incorreta. Tentativa ${_senhaTentativas}/5.`;
+                if (_senhaTentativas >= 5) {
+                    tentEl.textContent = '🔒 Muitas tentativas. Tente novamente em alguns instantes.';
+                    document.getElementById('senha-confirm-btn').disabled = true;
+                    setTimeout(() => {
+                        document.getElementById('senha-confirm-btn').disabled = false;
+                        _senhaTentativas = 0;
+                        tentEl.textContent = '';
+                    }, 30000);
+                }
+            }
+        });
+
         // ── DOM ──────────────────────────────────
         const tbody          = document.getElementById('dados-tabela');
         const form           = document.getElementById('produto-form');
@@ -1944,23 +2126,23 @@
 
                 // Eventos
                 document.querySelectorAll('.btn-baixa').forEach(btn => {
-                    btn.addEventListener('click', () => baixarItem(parseInt(btn.dataset.id, 10)));
+                    btn.addEventListener('click', () => {
+                        const id = parseInt(btn.dataset.id, 10);
+                        pedirSenha('BAIXA (exclusão) do produto ID ' + id, () => baixarItem(id));
+                    });
                 });
                 document.querySelectorAll('.btn-reservar').forEach(btn => {
-                    btn.addEventListener('click', () => abrirModalReserva({
-                        id:      parseInt(btn.dataset.id, 10),
-                        desc:    btn.dataset.desc,
-                        saldo:   parseFloat(btn.dataset.saldo),
-                        reserva: parseFloat(btn.dataset.reserva)
-                    }));
+                    btn.addEventListener('click', () => {
+                        const item = { id: parseInt(btn.dataset.id,10), desc: btn.dataset.desc, saldo: parseFloat(btn.dataset.saldo), reserva: parseFloat(btn.dataset.reserva) };
+                        pedirSenha('Reservar metros — ' + item.desc, () => abrirModalReserva(item));
+                    });
                 });
                 // Evento botão ajuste
                 document.querySelectorAll('.btn-ajuste').forEach(btn => {
-                    btn.addEventListener('click', () => abrirModalAjuste({
-                        id:   parseInt(btn.dataset.id, 10),
-                        desc: btn.dataset.desc,
-                        mts:  parseFloat(btn.dataset.mts)
-                    }));
+                    btn.addEventListener('click', () => {
+                        const item = { id: parseInt(btn.dataset.id,10), desc: btn.dataset.desc, mts: parseFloat(btn.dataset.mts) };
+                        pedirSenha('Ajuste de metros lineares — ' + item.desc, () => abrirModalAjuste(item));
+                    });
                 });
                 // Evento clique na linha → abre drawer
                 document.querySelectorAll('.linha-produto').forEach(tr => {
@@ -2030,18 +2212,22 @@
             tbody.innerHTML = html;
             // Re-bind eventos nos botões filtrados
             tbody.querySelectorAll('.btn-ajuste').forEach(btn => {
-                btn.addEventListener('click', () => abrirModalAjuste({
-                    id: parseInt(btn.dataset.id,10), desc: btn.dataset.desc, mts: parseFloat(btn.dataset.mts)
-                }));
+                btn.addEventListener('click', () => {
+                    const item = { id: parseInt(btn.dataset.id,10), desc: btn.dataset.desc, mts: parseFloat(btn.dataset.mts) };
+                    pedirSenha('Ajuste de metros lineares — ' + item.desc, () => abrirModalAjuste(item));
+                });
             });
             tbody.querySelectorAll('.btn-baixa').forEach(btn => {
-                btn.addEventListener('click', () => baixarItem(parseInt(btn.dataset.id, 10)));
+                btn.addEventListener('click', () => {
+                    const id = parseInt(btn.dataset.id, 10);
+                    pedirSenha('BAIXA (exclusão) do produto ID ' + id, () => baixarItem(id));
+                });
             });
             tbody.querySelectorAll('.btn-reservar').forEach(btn => {
-                btn.addEventListener('click', () => abrirModalReserva({
-                    id: parseInt(btn.dataset.id,10), desc: btn.dataset.desc,
-                    saldo: parseFloat(btn.dataset.saldo), reserva: parseFloat(btn.dataset.reserva)
-                }));
+                btn.addEventListener('click', () => {
+                    const item = { id: parseInt(btn.dataset.id,10), desc: btn.dataset.desc, saldo: parseFloat(btn.dataset.saldo), reserva: parseFloat(btn.dataset.reserva) };
+                    pedirSenha('Reservar metros — ' + item.desc, () => abrirModalReserva(item));
+                });
             });
             tbody.querySelectorAll('.linha-produto').forEach(tr => {
                 tr.addEventListener('click', function() {
@@ -2247,11 +2433,11 @@
 
                 // Eventos dos botões remover por linha
                 container.querySelectorAll('.btn-remover-linha').forEach(btn => {
-                    btn.addEventListener('click', async () => {
+                    btn.addEventListener('click', () => {
                         const reservaId = parseInt(btn.dataset.reservaId, 10);
                         const prodId    = parseInt(btn.dataset.produtoId, 10);
                         const mtsRes    = parseFloat(btn.dataset.mts);
-                        await removerReservaLinha(reservaId, prodId, mtsRes, btn);
+                        pedirSenha('Remover reserva de ' + mtsRes + ' m', () => removerReservaLinha(reservaId, prodId, mtsRes, btn));
                     });
                 });
 
@@ -2525,17 +2711,19 @@
 
             // Evento: deletar corte
             tbodyCortes.querySelectorAll('.btn-del-corte').forEach(btn => {
-                btn.addEventListener('click', async function() {
-                    if (!confirm('Excluir este registro de corte?')) return;
+                btn.addEventListener('click', function() {
                     const id = parseInt(this.dataset.id, 10);
-                    try {
-                        const { error } = await sb.from('cortes').delete().eq('id', id);
-                        if (error) throw error;
-                        exibirSucesso(msgCortes, 'Registro removido.');
-                        await carregarCortes();
-                    } catch (err) {
-                        exibirErro(msgCortes, err);
-                    }
+                    pedirSenha('Excluir registro de corte ID ' + id, async () => {
+                        if (!confirm('Excluir este registro de corte?')) return;
+                        try {
+                            const { error } = await sb.from('cortes').delete().eq('id', id);
+                            if (error) throw error;
+                            exibirSucesso(msgCortes, 'Registro removido.');
+                            await carregarCortes();
+                        } catch (err) {
+                            exibirErro(msgCortes, err);
+                        }
+                    });
                 });
             });
 
@@ -2811,7 +2999,7 @@
         }
         function fecharModalPv() { modalPv.classList.remove('open'); }
 
-        document.getElementById('btn-add-pv').addEventListener('click', abrirModalPv);
+        document.getElementById('btn-add-pv').addEventListener('click', () => pedirSenha('Adicionar novo PV (Cortes para Pedidos)', abrirModalPv));
         document.getElementById('pv-close-btn').addEventListener('click', fecharModalPv);
         document.getElementById('pv-cancel-btn').addEventListener('click', fecharModalPv);
         modalPv.addEventListener('click', e => { if (e.target === modalPv) fecharModalPv(); });
@@ -3127,7 +3315,7 @@
                 };
             }
         });
-        document.getElementById('btn-import-estoque').addEventListener('click', () => importEstoque.abrirModal());
+        document.getElementById('btn-import-estoque').addEventListener('click', () => pedirSenha('Importar estoque em massa', () => importEstoque.abrirModal()));
 
         // ── Instancia modal cortes ────────────────
         const importCortes = setupImportModal({
@@ -3167,7 +3355,7 @@
                 };
             }
         });
-        document.getElementById('btn-import-cortes').addEventListener('click', () => importCortes.abrirModal());
+        document.getElementById('btn-import-cortes').addEventListener('click', () => pedirSenha('Importar cortes em massa', () => importCortes.abrirModal()));
 
         // ── PLANO DE CORTE ───────────────────────
         async function carregarPlanodeCorte() {
