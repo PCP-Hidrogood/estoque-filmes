@@ -48,6 +48,15 @@
             text-align: center;
             margin-bottom: 32px;
         }
+        .header-logo {
+            margin-bottom: 14px;
+        }
+        .header-logo img {
+            height: 64px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 12px rgba(0,0,0,0.4));
+        }
         .header-eyebrow {
             font-size: 11px;
             font-weight: 700;
@@ -760,9 +769,183 @@
         .vis-toolbar {
             display: flex;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: space-between;
             gap: 10px;
             margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .vis-toolbar-filters {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .vis-toolbar-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-ajuste {
+            background: rgba(79,124,255,0.12);
+            color: var(--accent);
+            border: 1px solid rgba(79,124,255,0.3);
+            padding: 5px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .btn-ajuste:hover { background: var(--accent); color: #fff; }
+
+        /* Plano de corte */
+        .plano-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .plano-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .plano-header .plano-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .btn-print {
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            letter-spacing: 0.04em;
+        }
+        .btn-print:hover { background: var(--accent-hover); }
+
+        .plano-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .plano-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .plano-card-produto {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .plano-card-caract {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .plano-card-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .plano-meta-item { text-align: right; }
+        .plano-meta-item .lbl {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .plano-meta-item .val {
+            font-size: 13px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+        }
+        .plano-reservas-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .plano-reservas-table th {
+            padding: 9px 14px;
+            background: rgba(255,255,255,0.02);
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .plano-reservas-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+        .plano-reservas-table tr:last-child td { border-bottom: none; }
+        .plano-empty {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .plano-empty .icon { font-size: 40px; margin-bottom: 12px; }
+        .plano-total-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 24px;
+            padding: 14px 18px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        .plano-total-item { text-align: right; }
+        .plano-total-item .lbl {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+        .plano-total-item .val {
+            font-size: 15px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--yellow);
+        }
+
+        /* Print styles */
+        @media print {
+            body { background: #fff !important; padding: 0; }
+            .header, .tabs, .tab-content:not(#plano-corte),
+            .drawer, .drawer-overlay,
+            div[id^="modal"] { display: none !important; }
+            #plano-corte { display: block !important; }
+            .plano-header .btn-print { display: none; }
+            .container { border: none; box-shadow: none; border-radius: 0; }
+            .plano-card { border: 1px solid #ccc; break-inside: avoid; }
+            .plano-card-header { background: #f5f5f5 !important; }
+            .plano-card-produto { color: #000 !important; }
+            .plano-card-caract, .plano-meta-item .lbl, .plano-total-item .lbl { color: #666 !important; }
+            .plano-meta-item .val, .plano-total-item .val, .plano-reservas-table td { color: #000 !important; }
+            .plano-reservas-table th { background: #eee !important; color: #333 !important; }
+            .badge { border: 1px solid #ccc !important; color: #000 !important; background: #f5f5f5 !important; }
         }
 
         .btn-import {
@@ -1073,6 +1256,51 @@
     </div>
 
 
+
+    <!-- MODAL AJUSTE DE METROS -->
+    <div id="modal-ajuste" class="modal-overlay">
+        <div class="modal" style="max-width:440px;">
+            <div class="modal-header">
+                <div>
+                    <h2>✏️ Ajustar Metros Lineares</h2>
+                    <div class="modal-sub" id="ajuste-desc-produto"></div>
+                </div>
+                <button class="modal-close" id="ajuste-close-btn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-info-row" style="margin-bottom:16px;">
+                    <span class="lbl">Mts Lineares atuais</span>
+                    <span class="val" id="ajuste-mts-atual">—</span>
+                </div>
+                <div class="modal-field">
+                    <label>Operação <span class="req">*</span></label>
+                    <select id="ajuste-operacao" style="width:100%;">
+                        <option value="adicionar">➕ Adicionar metros</option>
+                        <option value="remover">➖ Remover metros</option>
+                        <option value="definir">✏️ Definir valor exato</option>
+                    </select>
+                </div>
+                <div class="modal-field">
+                    <label id="ajuste-qtd-label">Quantidade (metros lineares) <span class="req">*</span></label>
+                    <input type="number" id="ajuste-quantidade" step="0.01" min="0.01" placeholder="0.00" style="width:100%;" />
+                </div>
+                <div class="modal-field">
+                    <label>Motivo do ajuste <span style="color:var(--text-muted);font-weight:400;">(opcional)</span></label>
+                    <input type="text" id="ajuste-motivo" placeholder="Ex: Corte de amostra, recontagem..." style="width:100%;" />
+                </div>
+                <div id="ajuste-preview" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-top:4px;font-size:12px;">
+                    <span style="color:var(--text-muted);">Novo valor: </span>
+                    <strong id="ajuste-preview-val" style="font-family:JetBrains Mono,monospace;color:var(--accent);font-size:14px;"></strong>
+                </div>
+                <div id="ajuste-erro" class="mensagem erro" style="margin-top:14px;margin-bottom:0;display:none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="ajuste-cancel-btn">Cancelar</button>
+                <button class="btn-confirm" id="ajuste-confirm-btn">✓ Confirmar Ajuste</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL IMPORTAR ESTOQUE -->
     <div id="modal-import-estoque" class="modal-overlay">
         <div class="modal" style="max-width:720px;">
@@ -1214,6 +1442,9 @@
 
     <!-- CABEÇALHO -->
     <div class="header">
+        <div class="header-logo">
+            <img src="https://ibrahort.org.br/wp-content/uploads/2025/02/logo-grupo-hidrogoodresultado.webp" alt="Grupo Hidrogood" />
+        </div>
         <div class="header-eyebrow">Sistema de Gestão</div>
         <h1>Controle de Corte de<br><span>Filmes e Telas</span></h1>
         <div class="header-line"></div>
@@ -1224,14 +1455,22 @@
             <button id="tab-visualizar-btn" class="tab-btn active">Visualizar / Gerenciar</button>
             <button id="tab-inserir-btn" class="tab-btn">Inserir Novo Item</button>
             <button id="tab-cortes-btn" class="tab-btn">Cortes para Pedidos</button>
+            <button id="tab-plano-btn" class="tab-btn">Plano de Corte</button>
         </div>
 
         <!-- ABA: VISUALIZAR -->
         <div id="visualizar" class="tab-content active">
             <div id="mensagem-visualizar" class="mensagem"></div>
             <div class="vis-toolbar">
-                <button class="btn-import" id="btn-import-estoque">⬆ Importar</button>
-                <button class="btn-excel" id="btn-excel-estoque">⬇ Exportar Excel</button>
+                <div class="vis-toolbar-filters">
+                    <input type="text" class="filter-input" id="filtro-vis-desc" placeholder="🔍 Descrição / Item..." />
+                    <input type="text" class="filter-input" id="filtro-vis-caract" placeholder="🔍 Característica..." />
+                    <input type="text" class="filter-input" id="filtro-vis-largura" placeholder="🔍 Largura..." />
+                </div>
+                <div class="vis-toolbar-actions">
+                    <button class="btn-import" id="btn-import-estoque">⬆ Importar</button>
+                    <button class="btn-excel" id="btn-excel-estoque">⬇ Exportar Excel</button>
+                </div>
             </div>
             <div class="table-responsive">
                 <table>
@@ -1364,6 +1603,21 @@
                 </table>
             </div>
         </div>
+
+        <!-- ABA: PLANO DE CORTE -->
+        <div id="plano-corte" class="tab-content">
+            <div id="mensagem-plano" class="mensagem"></div>
+            <div class="plano-header">
+                <div>
+                    <h2>📋 Plano de Corte</h2>
+                    <div class="plano-meta" id="plano-meta-info">Carregando...</div>
+                </div>
+                <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
+            </div>
+            <div id="plano-conteudo">
+                <div class="plano-empty"><div class="icon">⏳</div>Carregando plano de corte...</div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1382,9 +1636,11 @@
         const tabVisualizar  = document.getElementById('visualizar');
         const tabInserir     = document.getElementById('inserir');
         const tabCortes      = document.getElementById('cortes');
+        const tabPlano       = document.getElementById('plano-corte');
         const btnVisualizar  = document.getElementById('tab-visualizar-btn');
         const btnInserir     = document.getElementById('tab-inserir-btn');
         const btnTabCortes   = document.getElementById('tab-cortes-btn');
+        const btnTabPlano    = document.getElementById('tab-plano-btn');
         const msgVisualizar  = document.getElementById('mensagem-visualizar');
         const msgInserir     = document.getElementById('mensagem-inserir');
         const msgCortes      = document.getElementById('mensagem-cortes');
@@ -1457,6 +1713,9 @@
                         <td style="color:var(--text-secondary);font-size:12px;">${escapeHTML(item.observacao || '—')}</td>
                         <td class="actions-cell" onclick="event.stopPropagation()">
                             <div class="actions">
+                                <button class="btn-ajuste" data-id="${item.id}"
+                                    data-desc="${escapeHTML(item.descricao_do_produto || '')}"
+                                    data-mts="${item.mts_lineares ?? 0}">AJUSTE</button>
                                 <button class="btn-baixa"  data-id="${item.id}">BAIXA</button>
                                 <button class="btn-reservar" data-id="${item.id}"
                                     data-desc="${escapeHTML(item.descricao_do_produto || '')}"
@@ -1480,6 +1739,14 @@
                         reserva: parseFloat(btn.dataset.reserva)
                     }));
                 });
+                // Evento botão ajuste
+                document.querySelectorAll('.btn-ajuste').forEach(btn => {
+                    btn.addEventListener('click', () => abrirModalAjuste({
+                        id:   parseInt(btn.dataset.id, 10),
+                        desc: btn.dataset.desc,
+                        mts:  parseFloat(btn.dataset.mts)
+                    }));
+                });
                 // Evento clique na linha → abre drawer
                 document.querySelectorAll('.linha-produto').forEach(tr => {
                     tr.addEventListener('click', function() {
@@ -1488,11 +1755,177 @@
                         if (item) abrirDrawer(item);
                     });
                 });
+                // Guarda dados para filtros
+                estoqueData = data;
             } catch (err) {
                 tbody.innerHTML = `<tr><td colspan="13" style="color:var(--red);padding:20px;">Erro ao carregar dados: ${escapeHTML(err.message || 'Erro desconhecido')}</td></tr>`;
                 exibirErro(msgVisualizar, err);
             }
         }
+
+        // ── DADOS E FILTROS DA ABA VISUALIZAR ───
+        let estoqueData = [];
+
+        function aplicarFiltrosEstoque() {
+            const fd = (document.getElementById('filtro-vis-desc').value   || '').toLowerCase();
+            const fc = (document.getElementById('filtro-vis-caract').value || '').toLowerCase();
+            const fl = (document.getElementById('filtro-vis-largura').value|| '').toLowerCase();
+            let html = '';
+            const filtrado = estoqueData.filter(item => {
+                const desc  = (item.descricao_do_produto || '').toLowerCase();
+                const caract = (item.caracteristica || '').toLowerCase();
+                const larg   = String(item.largura_mts ?? '');
+                return (!fd || desc.includes(fd)) &&
+                       (!fc || caract.includes(fc)) &&
+                       (!fl || larg.includes(fl));
+            });
+            if (!filtrado.length) {
+                tbody.innerHTML = '<tr><td colspan="13" style="color:var(--text-muted);padding:20px;">Nenhum resultado encontrado.</td></tr>';
+                return;
+            }
+            filtrado.forEach(item => {
+                html += `
+                    <tr class="linha-produto" data-id="${item.id}">
+                        <td class="id-cell">${item.id}</td>
+                        <td class="bold-cell">${escapeHTML(item.descricao_do_produto || '')}</td>
+                        <td style="color:var(--text-secondary);">${escapeHTML(item.caracteristica || '—')}</td>
+                        <td class="num-cell">${item.largura_mts ?? 0}</td>
+                        <td class="num-cell">${item.comprim_mts ?? 0}</td>
+                        <td class="num-cell">${item.qtde_rolos_un ?? 0}</td>
+                        <td class="num-cell">${item.qtde_m2 ?? 0}</td>
+                        <td class="num-cell">${item.mts_lineares ?? 0}</td>
+                        <td class="num-cell" style="color:var(--yellow);">${item.reserva_mts ?? 0}</td>
+                        <td class="num-cell" style="color:var(--green);font-weight:700;">${item.saldo_livre_mts ?? 0}</td>
+                        <td>${badgeStatus(item.status)}</td>
+                        <td style="color:var(--text-secondary);font-size:12px;">${escapeHTML(item.observacao || '—')}</td>
+                        <td class="actions-cell" onclick="event.stopPropagation()">
+                            <div class="actions">
+                                <button class="btn-ajuste" data-id="${item.id}"
+                                    data-desc="${escapeHTML(item.descricao_do_produto || '')}"
+                                    data-mts="${item.mts_lineares ?? 0}">AJUSTE</button>
+                                <button class="btn-baixa"  data-id="${item.id}">BAIXA</button>
+                                <button class="btn-reservar" data-id="${item.id}"
+                                    data-desc="${escapeHTML(item.descricao_do_produto || '')}"
+                                    data-saldo="${item.saldo_livre_mts ?? 0}"
+                                    data-reserva="${item.reserva_mts ?? 0}">RESERVAR</button>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+            tbody.innerHTML = html;
+            // Re-bind eventos nos botões filtrados
+            tbody.querySelectorAll('.btn-ajuste').forEach(btn => {
+                btn.addEventListener('click', () => abrirModalAjuste({
+                    id: parseInt(btn.dataset.id,10), desc: btn.dataset.desc, mts: parseFloat(btn.dataset.mts)
+                }));
+            });
+            tbody.querySelectorAll('.btn-baixa').forEach(btn => {
+                btn.addEventListener('click', () => baixarItem(parseInt(btn.dataset.id, 10)));
+            });
+            tbody.querySelectorAll('.btn-reservar').forEach(btn => {
+                btn.addEventListener('click', () => abrirModalReserva({
+                    id: parseInt(btn.dataset.id,10), desc: btn.dataset.desc,
+                    saldo: parseFloat(btn.dataset.saldo), reserva: parseFloat(btn.dataset.reserva)
+                }));
+            });
+            tbody.querySelectorAll('.linha-produto').forEach(tr => {
+                tr.addEventListener('click', function() {
+                    const id   = parseInt(this.dataset.id, 10);
+                    const item = estoqueData.find(d => d.id === id);
+                    if (item) abrirDrawer(item);
+                });
+            });
+        }
+        document.getElementById('filtro-vis-desc').addEventListener('input', aplicarFiltrosEstoque);
+        document.getElementById('filtro-vis-caract').addEventListener('input', aplicarFiltrosEstoque);
+        document.getElementById('filtro-vis-largura').addEventListener('input', aplicarFiltrosEstoque);
+
+        // ── MODAL AJUSTE DE METROS ───────────────
+        let ajusteItemAtual = null;
+
+        function abrirModalAjuste(item) {
+            ajusteItemAtual = item;
+            document.getElementById('ajuste-desc-produto').textContent = item.desc;
+            document.getElementById('ajuste-mts-atual').textContent    = item.mts + ' m';
+            document.getElementById('ajuste-operacao').value           = 'adicionar';
+            document.getElementById('ajuste-quantidade').value         = '';
+            document.getElementById('ajuste-motivo').value             = '';
+            document.getElementById('ajuste-preview').style.display    = 'none';
+            document.getElementById('ajuste-erro').style.display       = 'none';
+            document.getElementById('modal-ajuste').classList.add('open');
+            setTimeout(() => document.getElementById('ajuste-quantidade').focus(), 100);
+        }
+
+        function fecharModalAjuste() {
+            document.getElementById('modal-ajuste').classList.remove('open');
+            ajusteItemAtual = null;
+        }
+        document.getElementById('ajuste-close-btn').addEventListener('click', fecharModalAjuste);
+        document.getElementById('ajuste-cancel-btn').addEventListener('click', fecharModalAjuste);
+        document.getElementById('modal-ajuste').addEventListener('click', e => {
+            if (e.target === document.getElementById('modal-ajuste')) fecharModalAjuste();
+        });
+
+        // Preview ao digitar
+        ['ajuste-operacao','ajuste-quantidade'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                if (!ajusteItemAtual) return;
+                const op  = document.getElementById('ajuste-operacao').value;
+                const qtd = parseFloat(document.getElementById('ajuste-quantidade').value) || 0;
+                if (!qtd) { document.getElementById('ajuste-preview').style.display='none'; return; }
+                let novo;
+                if (op === 'adicionar') novo = ajusteItemAtual.mts + qtd;
+                else if (op === 'remover') novo = ajusteItemAtual.mts - qtd;
+                else novo = qtd;
+                document.getElementById('ajuste-preview-val').textContent = novo.toFixed(2) + ' m';
+                document.getElementById('ajuste-preview').style.display = 'block';
+                const lbl = op === 'definir' ? 'Valor que será definido:' : 'Novo valor:';
+                document.getElementById('ajuste-preview').querySelector('span').textContent = lbl + ' ';
+            });
+        });
+
+        document.getElementById('ajuste-confirm-btn').addEventListener('click', async () => {
+            const erroEl = document.getElementById('ajuste-erro');
+            erroEl.style.display = 'none';
+            const op  = document.getElementById('ajuste-operacao').value;
+            const qtd = parseFloat(document.getElementById('ajuste-quantidade').value);
+            if (!qtd || qtd <= 0) {
+                exibirMensagem(erroEl, '❌ Informe uma quantidade válida.', 'erro');
+                erroEl.style.display = 'block';
+                return;
+            }
+            let novoMts;
+            if (op === 'adicionar')     novoMts = ajusteItemAtual.mts + qtd;
+            else if (op === 'remover')  novoMts = ajusteItemAtual.mts - qtd;
+            else                        novoMts = qtd;
+            if (novoMts < 0) {
+                exibirMensagem(erroEl, '❌ O valor resultante seria negativo (' + novoMts.toFixed(2) + ' m).', 'erro');
+                erroEl.style.display = 'block';
+                return;
+            }
+            const btn = document.getElementById('ajuste-confirm-btn');
+            btn.disabled = true; btn.textContent = 'Salvando…';
+            try {
+                // comprim_mts é coluna gerada, então atualizamos só qtde_rolos_un para manter compatibilidade
+                // A coluna mts_lineares = largura * comprim_mts * qtde_rolos_un (gerada)
+                // Como não podemos escrever direto em mts_lineares, buscamos largura e recalculamos comprim_mts
+                const { data: prod } = await sb.from(NOME_TABELA).select('largura_mts, qtde_rolos_un').eq('id', ajusteItemAtual.id).single();
+                const largura = parseFloat(prod.largura_mts) || 1;
+                const rolos   = parseInt(prod.qtde_rolos_un) || 1;
+                // mts_lineares = rolos * comprim_mts  →  comprim_mts = novoMts / rolos
+                const novoComprim = novoMts / rolos;
+                const { error } = await sb.from(NOME_TABELA).update({ comprim_mts: parseFloat(novoComprim.toFixed(4)) }).eq('id', ajusteItemAtual.id);
+                if (error) throw error;
+                fecharModalAjuste();
+                exibirSucesso(msgVisualizar, `Ajuste realizado! Novo valor: ${novoMts.toFixed(2)} m lineares.`);
+                await carregarDados();
+            } catch (err) {
+                exibirMensagem(erroEl, '❌ Erro: ' + (err.message || err), 'erro');
+                erroEl.style.display = 'block';
+            } finally {
+                btn.disabled = false; btn.textContent = '✓ Confirmar Ajuste';
+            }
+        });
 
         // ── BAIXA (excluir) ──────────────────────
         async function baixarItem(id) {
@@ -2115,7 +2548,8 @@
         function normKey(k) {
             return String(k).trim().toLowerCase()
                 .normalize('NFD').replace(/[̀-ͯ]/g, '')
-                .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+                .replace(/[\s_]+/g, '_').replace(/[^a-z0-9_]/g, '')
+                .replace(/_+/g, '_').replace(/^_|_$/g, '');
         }
 
         function normRow(row) {
@@ -2273,17 +2707,32 @@
             onSuccess:     carregarDados,
             cols: ['descricao_do_produto','caracteristica','largura_mts','comprim_mts','qtde_rolos_un','reserva_mts','status','observacao'],
             mapRow: r => {
-                const desc = String(r['descricao_do_produto'] || r['descricao'] || r['produto'] || '').trim();
+                // Busca tolerante: testa chave exata e depois match parcial
+                function fv(row, ...cands) {
+                    for (const c of cands) {
+                        if (row[c] !== undefined && row[c] !== '') return row[c];
+                    }
+                    const keys = Object.keys(row);
+                    for (const c of cands) {
+                        const k = keys.find(k2 => k2.includes(c) || c.includes(k2));
+                        if (k && row[k] !== undefined && row[k] !== '') return row[k];
+                    }
+                    return '';
+                }
+                const desc = String(fv(r, 'descricao_do_produto', 'descricaodoproduto', 'descricao', 'produto')).trim();
                 if (!desc) return null;
+                const statusRaw = String(fv(r, 'status') || 'Disponível').trim();
+                const statusMap = {'disponivel':'Disponível','disponível':'Disponível','indisponivel':'Indisponível','indisponível':'Indisponível','com reserva':'Com Reserva'};
+                const status = statusMap[statusRaw.toLowerCase()] || statusRaw || 'Disponível';
                 return {
                     descricao_do_produto: desc,
-                    caracteristica:  String(r['caracteristica'] || '').trim() || null,
-                    largura_mts:     parseFloat(r['largura_mts'] || r['largura'] || 0) || 0,
-                    comprim_mts:     parseFloat(r['comprim_mts'] || r['comprimento'] || r['comprim'] || 0) || 0,
-                    qtde_rolos_un:   parseInt(r['qtde_rolos_un'] || r['rolos'] || r['qtde_rolos'] || 1, 10) || 1,
-                    reserva_mts:     parseFloat(r['reserva_mts'] || r['reserva'] || 0) || 0,
-                    status:          String(r['status'] || 'Disponível').trim() || 'Disponível',
-                    observacao:      String(r['observacao'] || r['obs'] || '').trim() || null,
+                    caracteristica:  String(fv(r, 'caracteristica') || '').trim() || null,
+                    largura_mts:     parseFloat(fv(r, 'largura_mts', 'largura')) || 0,
+                    comprim_mts:     parseFloat(fv(r, 'comprim_mts', 'comprimento', 'comprim')) || 0,
+                    qtde_rolos_un:   parseInt(fv(r, 'qtde_rolos_un', 'qtde_rolos', 'rolos') || 1, 10) || 1,
+                    reserva_mts:     parseFloat(fv(r, 'reserva_mts', 'reservamts', 'reserva')) || 0,
+                    status:          status,
+                    observacao:      String(fv(r, 'observacao', 'observação', 'obs') || '').trim() || null,
                 };
             }
         });
@@ -2329,6 +2778,118 @@
         });
         document.getElementById('btn-import-cortes').addEventListener('click', () => importCortes.abrirModal());
 
+        // ── PLANO DE CORTE ───────────────────────
+        async function carregarPlanodeCorte() {
+            const conteudo = document.getElementById('plano-conteudo');
+            const metaInfo = document.getElementById('plano-meta-info');
+            conteudo.innerHTML = '<div class="plano-empty"><div class="icon">⏳</div>Carregando...</div>';
+
+            try {
+                // Busca produtos COM RESERVA
+                const { data: produtos, error: errProd } = await sb
+                    .from(NOME_TABELA)
+                    .select('*')
+                    .eq('status', 'Com Reserva')
+                    .order('id', { ascending: true });
+                if (errProd) throw errProd;
+
+                if (!produtos || produtos.length === 0) {
+                    conteudo.innerHTML = '<div class="plano-empty"><div class="icon">✅</div>Nenhum produto com reserva ativa no momento.</div>';
+                    metaInfo.textContent = '0 produtos com reserva';
+                    return;
+                }
+
+                // Busca todas as reservas desses produtos
+                const prodIds = produtos.map(p => p.id);
+                const { data: reservas, error: errRes } = await sb
+                    .from('reservas')
+                    .select('*')
+                    .in('produto_id', prodIds)
+                    .order('criado_em', { ascending: true });
+                if (errRes) throw errRes;
+
+                const fmtData = iso => {
+                    if (!iso) return '—';
+                    const [y,m,d] = iso.split('T')[0].split('-');
+                    return d+'/'+m+'/'+y;
+                };
+
+                const hoje = new Date().toLocaleDateString('pt-BR');
+                metaInfo.textContent = `${produtos.length} produto(s) com reserva · Gerado em ${hoje}`;
+
+                let totalMtsReservados = 0;
+                let html = '';
+
+                produtos.forEach(prod => {
+                    const resDosProd = (reservas || []).filter(r => r.produto_id === prod.id);
+                    const totalProd  = resDosProd.reduce((s, r) => s + parseFloat(r.reserva_mts || 0), 0);
+                    totalMtsReservados += totalProd;
+
+                    const linhas = resDosProd.map(r => `
+                        <tr>
+                            <td style="font-family:JetBrains Mono,monospace;color:var(--yellow);font-weight:700;">${escapeHTML(r.pedido)}</td>
+                            <td style="font-family:JetBrains Mono,monospace;font-weight:700;">${r.reserva_mts} m</td>
+                            <td style="color:var(--text-secondary);">${escapeHTML(r.obs_reserva || '—')}</td>
+                            <td style="color:var(--text-muted);font-size:11px;">${fmtData(r.criado_em)}</td>
+                        </tr>`).join('');
+
+                    html += `
+                    <div class="plano-card">
+                        <div class="plano-card-header">
+                            <div>
+                                <div class="plano-card-produto">${escapeHTML(prod.descricao_do_produto || '—')}</div>
+                                <div class="plano-card-caract">${escapeHTML(prod.caracteristica || '')} · Largura: ${prod.largura_mts ?? '—'} m · Compr.: ${prod.comprim_mts ?? '—'} m</div>
+                            </div>
+                            <div class="plano-card-meta">
+                                <div class="plano-meta-item">
+                                    <div class="lbl">Mts Lineares</div>
+                                    <div class="val">${prod.mts_lineares ?? '—'} m</div>
+                                </div>
+                                <div class="plano-meta-item">
+                                    <div class="lbl">Saldo Livre</div>
+                                    <div class="val" style="color:var(--green);">${prod.saldo_livre_mts ?? '—'} m</div>
+                                </div>
+                                <div class="plano-meta-item">
+                                    <div class="lbl">Total Reservado</div>
+                                    <div class="val" style="color:var(--yellow);">${totalProd.toFixed(2)} m</div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="plano-reservas-table">
+                            <thead>
+                                <tr>
+                                    <th>Pedido</th>
+                                    <th>Metros</th>
+                                    <th>Observação</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>${linhas || '<tr><td colspan="4" style="color:var(--text-muted);padding:12px;">Sem registros na tabela reservas.</td></tr>'}</tbody>
+                        </table>
+                        <div class="plano-total-row">
+                            <div class="plano-total-item">
+                                <div class="lbl">Total reservado neste produto</div>
+                                <div class="val">${totalProd.toFixed(2)} m</div>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+
+                html += `
+                <div style="display:flex;justify-content:flex-end;margin-top:8px;padding:14px 4px;">
+                    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 24px;text-align:right;">
+                        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Total geral reservado</div>
+                        <div style="font-size:22px;font-weight:800;font-family:JetBrains Mono,monospace;color:var(--yellow);margin-top:4px;">${totalMtsReservados.toFixed(2)} m</div>
+                    </div>
+                </div>`;
+
+                conteudo.innerHTML = html;
+
+            } catch (err) {
+                conteudo.innerHTML = `<div class="plano-empty" style="color:var(--red);">Erro ao carregar: ${escapeHTML(err.message)}</div>`;
+            }
+        }
+
         // ── ABAS ─────────────────────────────────
         function switchTab(id) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -2341,6 +2902,10 @@
                 tabCortes.classList.add('active');
                 btnTabCortes.classList.add('active');
                 carregarCortes();
+            } else if (id === 'plano') {
+                tabPlano.classList.add('active');
+                btnTabPlano.classList.add('active');
+                carregarPlanodeCorte();
             } else {
                 tabInserir.classList.add('active');
                 btnInserir.classList.add('active');
@@ -2350,6 +2915,7 @@
         btnVisualizar.addEventListener('click', () => switchTab('visualizar'));
         btnInserir.addEventListener('click',    () => switchTab('inserir'));
         btnTabCortes.addEventListener('click',  () => switchTab('cortes'));
+        btnTabPlano.addEventListener('click',   () => switchTab('plano'));
 
         // ── INIT ─────────────────────────────────
         window.addEventListener('load', carregarDados);
